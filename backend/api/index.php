@@ -40,7 +40,7 @@ $envVars = [
     'CACHE_STORE'          => 'array',
     'LOG_CHANNEL'          => 'stderr',
     'APP_ENV'              => 'production',
-    'APP_DEBUG'            => 'true',
+    'APP_DEBUG'            => 'false',
     // Rediriger tous les caches vers /tmp (bootstrap/cache est read-only sur Vercel)
     'VIEW_COMPILED_PATH'   => $tmpStorage . '/framework/views',
     'APP_SERVICES_CACHE'   => '/tmp/services.php',
