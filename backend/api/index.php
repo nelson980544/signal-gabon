@@ -1,57 +1,30 @@
 <?php
 
-// ── Configuration Vercel ──────────────────────────────────────────────────────
-// /tmp est le seul dossier accessible en écriture sur Vercel
-
-// Activer l'affichage des erreurs pour diagnostic
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
+// Test de base
+header('Content-Type: text/plain');
 
 $tmpStorage = '/tmp/laravel-storage';
-
-// Créer la structure de dossiers storage dans /tmp
-foreach ([
-    '/app/preuves',
-    '/framework/cache/data',
-    '/framework/sessions',
-    '/framework/views',
-    '/logs',
-] as $dir) {
+$dirs = ['/app/preuves', '/framework/cache/data', '/framework/sessions', '/framework/views', '/logs'];
+foreach ($dirs as $dir) {
     if (!is_dir($tmpStorage . $dir)) {
         mkdir($tmpStorage . $dir, 0777, true);
     }
 }
 
-// Copier la base SQLite vers /tmp si elle n'y est pas encore
+echo "DIR CHECK:\n";
+foreach ($dirs as $dir) {
+    echo $tmpStorage . $dir . ": " . (is_dir($tmpStorage . $dir) ? "OK" : "FAIL") . "\n";
+}
+
 $dbDest = '/tmp/database.sqlite';
-if (!file_exists($dbDest)) {
-    $dbSource = __DIR__ . '/../database/database.sqlite';
-    if (file_exists($dbSource)) {
-        copy($dbSource, $dbDest);
-    }
+$dbSource = __DIR__ . '/../database/database.sqlite';
+echo "DB source: " . (file_exists($dbSource) ? "EXISTS" : "MISSING") . "\n";
+echo "DB dest: " . (file_exists($dbDest) ? "EXISTS" : "MISSING") . "\n";
+
+if (!file_exists($dbDest) && file_exists($dbSource)) {
+    copy($dbSource, $dbDest);
+    echo "DB copied\n";
 }
 
-// Variables d'environnement pour Laravel
-$envVars = [
-    'VERCEL_STORAGE_PATH'  => $tmpStorage,
-    'DB_CONNECTION'        => 'sqlite',
-    'DB_DATABASE'          => $dbDest,
-    'SESSION_DRIVER'       => 'cookie',
-    'CACHE_STORE'          => 'array',
-    'LOG_CHANNEL'          => 'stderr',
-    'APP_ENV'              => 'production',
-    'APP_DEBUG'            => 'true',
-    // VIEW_COMPILED_PATH doit être défini AVANT le chargement de la config
-    // car realpath() échoue si le dossier n'existe pas encore
-    'VIEW_COMPILED_PATH'   => $tmpStorage . '/framework/views',
-];
-
-foreach ($envVars as $key => $value) {
-    $_ENV[$key] = $value;
-    $_SERVER[$key] = $value;
-    putenv("$key=$value");
-}
-
-// ── Bootstrap Laravel ─────────────────────────────────────────────────────────
-require_once __DIR__ . '/../public/index.php';
+echo "PHP " . PHP_VERSION . "\n";
+echo "Done\n";
