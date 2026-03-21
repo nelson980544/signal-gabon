@@ -5,6 +5,8 @@
 /backend/storage/*.key
 /backend/storage/logs/
 /backend/bootstrap/cache/
+!/backend/bootstrap/cache/.gitignore
+!/backend/bootstrap/cache/packages.php
 /backend/public/storage
 /backend/.phpunit.result.cache
 /backend/node_modules/
