@@ -32,8 +32,16 @@ class AdminStatController extends Controller
             ];
         }
 
+        $db = config('database.default');
+        if ($db === 'pgsql') {
+            $rawAvg = 'AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 86400)';
+        } elseif ($db === 'mysql') {
+            $rawAvg = 'AVG(TIMESTAMPDIFF(SECOND, created_at, updated_at) / 86400)';
+        } else {
+            $rawAvg = 'AVG(JULIANDAY(updated_at) - JULIANDAY(created_at))';
+        }
         $avgDelay = Signalement::whereIn('statut', ['traite', 'classe'])
-            ->selectRaw('AVG(JULIANDAY(updated_at) - JULIANDAY(created_at)) as avg')
+            ->selectRaw("$rawAvg as avg")
             ->value('avg');
 
         return response()->json([
