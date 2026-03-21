@@ -40,3 +40,13 @@ Route::post('/debug-json', function(\Illuminate\Http\Request $req) {
         'post' => $_POST,
     ]);
 });
+
+// DEBUG ROUTE 2
+Route::post('/debug-login', function(\Illuminate\Http\Request $req) {
+    try {
+        $req->validate(['email' => 'required|email', 'password' => 'required']);
+        return response()->json(['status' => 'validate_ok', 'email' => $req->input('email')]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json(['status' => 'validate_fail', 'errors' => $e->errors(), 'all' => $req->all(), 'json_all' => $req->json()->all()]);
+    }
+});
