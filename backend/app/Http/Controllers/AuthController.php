@@ -9,6 +9,13 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
+        // Lire explicitement le JSON body avant la validation
+        // (correctif pour vercel-php qui ne propage pas php://input aux controllers)
+        if ($request->isJson() && !$request->input('email')) {
+            $jsonData = json_decode($request->getContent(), true) ?? [];
+            $request->merge($jsonData);
+        }
+
         $request->validate(['email' => 'required|email', 'password' => 'required']);
 
         if (!Auth::attempt($request->only('email', 'password'))) {
