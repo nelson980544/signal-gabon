@@ -1,35 +1,48 @@
 <?php
 
-// Sur Vercel, rediriger storage vers /tmp (seul dossier accessible en écriture)
+// ── Configuration Vercel ──────────────────────────────────────────────────────
+// /tmp est le seul dossier accessible en écriture sur Vercel
+
 $tmpStorage = '/tmp/laravel-storage';
 
-if (!is_dir($tmpStorage)) {
-    $dirs = [
-        '/app/preuves',
-        '/framework/cache/data',
-        '/framework/sessions',
-        '/framework/views',
-        '/logs',
-    ];
-    foreach ($dirs as $dir) {
+// Créer la structure de dossiers storage dans /tmp
+foreach ([
+    '/app/preuves',
+    '/framework/cache/data',
+    '/framework/sessions',
+    '/framework/views',
+    '/logs',
+] as $dir) {
+    if (!is_dir($tmpStorage . $dir)) {
         @mkdir($tmpStorage . $dir, 0777, true);
     }
 }
 
-$_ENV['VERCEL_STORAGE_PATH'] = $tmpStorage;
-putenv('VERCEL_STORAGE_PATH=' . $tmpStorage);
-
-// Copier la base SQLite vers /tmp si elle n'existe pas encore
-$dbSource = __DIR__ . '/../database/database.sqlite';
-$dbDest   = '/tmp/database.sqlite';
-
-if (!file_exists($dbDest) && file_exists($dbSource)) {
-    copy($dbSource, $dbDest);
+// Copier la base SQLite vers /tmp si elle n'y est pas encore
+$dbDest = '/tmp/database.sqlite';
+if (!file_exists($dbDest)) {
+    $dbSource = __DIR__ . '/../database/database.sqlite';
+    if (file_exists($dbSource)) {
+        copy($dbSource, $dbDest);
+    }
 }
 
-$_ENV['DB_DATABASE']  = $dbDest;
-putenv('DB_DATABASE=' . $dbDest);
-$_ENV['DB_CONNECTION'] = 'sqlite';
-putenv('DB_CONNECTION=sqlite');
+// Variables d'environnement pour Laravel
+$envVars = [
+    'VERCEL_STORAGE_PATH' => $tmpStorage,
+    'DB_CONNECTION'       => 'sqlite',
+    'DB_DATABASE'         => $dbDest,
+    'SESSION_DRIVER'      => 'cookie',
+    'CACHE_STORE'         => 'array',
+    'LOG_CHANNEL'         => 'stderr',
+    'APP_ENV'             => 'production',
+    'APP_DEBUG'           => 'false',
+];
 
+foreach ($envVars as $key => $value) {
+    $_ENV[$key] = $value;
+    putenv("$key=$value");
+}
+
+// ── Bootstrap Laravel ─────────────────────────────────────────────────────────
 require_once __DIR__ . '/../public/index.php';

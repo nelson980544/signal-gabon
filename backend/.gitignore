@@ -25,3 +25,5 @@ Thumbs.db
 
 # Garder la base SQLite pour déploiement Vercel
 !/database/database.sqlite
+
+.vercel
