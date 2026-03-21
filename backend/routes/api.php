@@ -50,3 +50,6 @@ Route::post('/debug-login', function(\Illuminate\Http\Request $req) {
         return response()->json(['status' => 'validate_fail', 'errors' => $e->errors(), 'all' => $req->all(), 'json_all' => $req->json()->all()]);
     }
 });
+
+// DEBUG ROUTE 3 - simulate AuthController
+Route::post('/debug-auth', [\App\Http\Controllers\AuthController::class, 'debugLogin']);

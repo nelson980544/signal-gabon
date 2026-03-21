@@ -49,4 +49,27 @@ class AuthController extends Controller
             'role' => $u->role,
         ]);
     }
+
+    public function debugLogin(Request $request)
+    {
+        $all = $request->all();
+        $jsonAll = $request->json()->all();
+        $isJson = $request->isJson();
+        $email = $request->input('email');
+
+        try {
+            $request->validate(['email' => 'required|email', 'password' => 'required']);
+            $validateResult = 'ok';
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $validateResult = $e->errors();
+        }
+
+        return response()->json([
+            'isJson' => $isJson,
+            'email' => $email,
+            'all' => $all,
+            'json_all' => $jsonAll,
+            'validate_result' => $validateResult,
+        ]);
+    }
 }
