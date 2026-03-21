@@ -29,14 +29,17 @@ if (!file_exists($dbDest)) {
 
 // Variables d'environnement pour Laravel
 $envVars = [
-    'VERCEL_STORAGE_PATH' => $tmpStorage,
-    'DB_CONNECTION'       => 'sqlite',
-    'DB_DATABASE'         => $dbDest,
-    'SESSION_DRIVER'      => 'cookie',
-    'CACHE_STORE'         => 'array',
-    'LOG_CHANNEL'         => 'stderr',
-    'APP_ENV'             => 'production',
-    'APP_DEBUG'           => 'true',
+    'VERCEL_STORAGE_PATH'  => $tmpStorage,
+    'DB_CONNECTION'        => 'sqlite',
+    'DB_DATABASE'          => $dbDest,
+    'SESSION_DRIVER'       => 'cookie',
+    'CACHE_STORE'          => 'array',
+    'LOG_CHANNEL'          => 'stderr',
+    'APP_ENV'              => 'production',
+    'APP_DEBUG'            => 'false',
+    // VIEW_COMPILED_PATH doit être défini AVANT le chargement de la config
+    // car realpath() échoue si le dossier n'existe pas encore
+    'VIEW_COMPILED_PATH'   => $tmpStorage . '/framework/views',
 ];
 
 foreach ($envVars as $key => $value) {
