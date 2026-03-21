@@ -9,17 +9,27 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        // Lire explicitement le JSON body avant la validation
-        // (correctif pour vercel-php qui ne propage pas php://input aux controllers)
-        if ($request->isJson() && !$request->input('email')) {
-            $jsonData = json_decode($request->getContent(), true) ?? [];
-            $request->merge($jsonData);
+        // Debug temporaire
+        $debugContent = $request->getContent();
+        $debugJson = $request->json()->all();
+        $debugIsJson = $request->isJson();
+        $debugInput = $request->input('email');
+        $debugAll = $request->all();
+
+        // Force la lecture du JSON
+        if ($debugIsJson && empty($debugAll)) {
+            $data = json_decode($debugContent ?: '{}', true) ?? [];
+            if (!empty($data)) {
+                $request->merge($data);
+            }
         }
+
+        $debugInfo = ['obj_id' => spl_object_id($request), 'isJson' => $debugIsJson, 'content_len' => strlen($debugContent), 'json_all' => $debugJson, 'input_email' => $debugInput, 'all' => $debugAll];
 
         $request->validate(['email' => 'required|email', 'password' => 'required']);
 
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Identifiants incorrects'], 401);
+            return response()->json(array_merge(['message' => 'Identifiants incorrects', '_debug' => $debugInfo]), 401);
         }
 
         $user = Auth::user();
