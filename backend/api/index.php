@@ -36,7 +36,7 @@ $envVars = [
     'CACHE_STORE'         => 'array',
     'LOG_CHANNEL'         => 'stderr',
     'APP_ENV'             => 'production',
-    'APP_DEBUG'           => 'false',
+    'APP_DEBUG'           => 'true',
 ];
 
 foreach ($envVars as $key => $value) {

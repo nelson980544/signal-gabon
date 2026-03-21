@@ -1,1 +1,2 @@
-*.sqlite*
+# database.sqlite inclus pour Vercel (production)
+*.sqlite-journal
