@@ -25,11 +25,12 @@ if (!file_exists($dbDest)) {
     }
 }
 
-// Vercel met PATH_INFO sans le préfixe /api (car le fichier est dans api/)
-// On restaure REQUEST_URI complet pour que Laravel route correctement
-if (isset($_SERVER['REQUEST_URI'])) {
-    $_SERVER['PATH_INFO'] = '/' . ltrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '', '/');
-}
+// Correctif Vercel : Symfony calcule le path relatif à SCRIPT_NAME.
+// Comme le fichier est dans api/, il enlève /api/ de REQUEST_URI.
+// On simule un script à la racine pour avoir le bon PATH_INFO.
+$_SERVER['SCRIPT_NAME']     = '/index.php';
+$_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/../public/index.php';
+$_SERVER['PHP_SELF']        = '/index.php';
 
 $envVars = [
     'VERCEL_STORAGE_PATH'  => $tmpStorage,
