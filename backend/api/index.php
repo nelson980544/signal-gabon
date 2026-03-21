@@ -1,16 +1,34 @@
 <?php
 
 // ── Configuration Vercel ──────────────────────────────────────────────────────
+// /tmp est le seul dossier accessible en écriture sur Vercel
+
 $tmpStorage = '/tmp/laravel-storage';
 
-foreach (['/app/preuves', '/framework/cache/data', '/framework/sessions', '/framework/views', '/logs'] as $dir) {
-    if (!is_dir($tmpStorage . $dir)) mkdir($tmpStorage . $dir, 0777, true);
+foreach ([
+    '/app/preuves',
+    '/framework/cache/data',
+    '/framework/sessions',
+    '/framework/views',
+    '/logs',
+] as $dir) {
+    if (!is_dir($tmpStorage . $dir)) {
+        mkdir($tmpStorage . $dir, 0777, true);
+    }
 }
 
 $dbDest = '/tmp/database.sqlite';
 if (!file_exists($dbDest)) {
     $dbSource = __DIR__ . '/../database/database.sqlite';
-    if (file_exists($dbSource)) copy($dbSource, $dbDest);
+    if (file_exists($dbSource)) {
+        copy($dbSource, $dbDest);
+    }
+}
+
+// Vercel met PATH_INFO sans le préfixe /api (car le fichier est dans api/)
+// On restaure REQUEST_URI complet pour que Laravel route correctement
+if (isset($_SERVER['REQUEST_URI'])) {
+    $_SERVER['PATH_INFO'] = '/' . ltrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '', '/');
 }
 
 $envVars = [
@@ -22,6 +40,7 @@ $envVars = [
     'LOG_CHANNEL'          => 'stderr',
     'APP_ENV'              => 'production',
     'APP_DEBUG'            => 'true',
+    // Rediriger tous les caches vers /tmp (bootstrap/cache est read-only sur Vercel)
     'VIEW_COMPILED_PATH'   => $tmpStorage . '/framework/views',
     'APP_SERVICES_CACHE'   => '/tmp/services.php',
     'APP_PACKAGES_CACHE'   => '/tmp/packages.php',
@@ -36,13 +55,5 @@ foreach ($envVars as $key => $value) {
     putenv("$key=$value");
 }
 
-// Debug: afficher les infos de la requête
-header('Content-Type: application/json');
-echo json_encode([
-    'REQUEST_URI'  => $_SERVER['REQUEST_URI'] ?? 'NOT SET',
-    'PATH_INFO'    => $_SERVER['PATH_INFO'] ?? 'NOT SET',
-    'SCRIPT_NAME'  => $_SERVER['SCRIPT_NAME'] ?? 'NOT SET',
-    'SCRIPT_FILENAME' => $_SERVER['SCRIPT_FILENAME'] ?? 'NOT SET',
-    'PHP_SELF'     => $_SERVER['PHP_SELF'] ?? 'NOT SET',
-    'HTTP_HOST'    => $_SERVER['HTTP_HOST'] ?? 'NOT SET',
-]);
+// ── Bootstrap Laravel ─────────────────────────────────────────────────────────
+require_once __DIR__ . '/../public/index.php';
