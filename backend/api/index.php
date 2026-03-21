@@ -3,6 +3,11 @@
 // ── Configuration Vercel ──────────────────────────────────────────────────────
 // /tmp est le seul dossier accessible en écriture sur Vercel
 
+// Activer l'affichage des erreurs pour diagnostic
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 $tmpStorage = '/tmp/laravel-storage';
 
 // Créer la structure de dossiers storage dans /tmp
@@ -14,7 +19,7 @@ foreach ([
     '/logs',
 ] as $dir) {
     if (!is_dir($tmpStorage . $dir)) {
-        @mkdir($tmpStorage . $dir, 0777, true);
+        mkdir($tmpStorage . $dir, 0777, true);
     }
 }
 
@@ -44,6 +49,7 @@ $envVars = [
 
 foreach ($envVars as $key => $value) {
     $_ENV[$key] = $value;
+    $_SERVER[$key] = $value;
     putenv("$key=$value");
 }
 
