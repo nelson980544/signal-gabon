@@ -28,3 +28,15 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::get('/stats', [AdminStatController::class, 'admin']);
     Route::get('/agents', [AdminAgentController::class, 'index']);
 });
+
+// DEBUG ROUTE - À SUPPRIMER
+Route::post('/debug-json', function(\Illuminate\Http\Request $req) {
+    return response()->json([
+        'isJson' => $req->isJson(),
+        'content_type' => $req->header('CONTENT_TYPE'),
+        'input_email' => $req->input('email'),
+        'json_all' => $req->json()->all(),
+        'content_raw' => $req->getContent(),
+        'post' => $_POST,
+    ]);
+});
