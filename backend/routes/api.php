@@ -28,37 +28,3 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::get('/stats', [AdminStatController::class, 'admin']);
     Route::get('/agents', [AdminAgentController::class, 'index']);
 });
-
-// DEBUG ROUTE - À SUPPRIMER
-Route::post('/debug-json', function(\Illuminate\Http\Request $req) {
-    return response()->json([
-        'isJson' => $req->isJson(),
-        'content_type' => $req->header('CONTENT_TYPE'),
-        'input_email' => $req->input('email'),
-        'json_all' => $req->json()->all(),
-        'content_raw' => $req->getContent(),
-        'post' => $_POST,
-    ]);
-});
-
-// DEBUG ROUTE 2
-Route::post('/debug-login', function(\Illuminate\Http\Request $req) {
-    try {
-        $req->validate(['email' => 'required|email', 'password' => 'required']);
-        return response()->json(['status' => 'validate_ok', 'email' => $req->input('email')]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json(['status' => 'validate_fail', 'errors' => $e->errors(), 'all' => $req->all(), 'json_all' => $req->json()->all()]);
-    }
-});
-
-// DEBUG ROUTE 3 - simulate AuthController
-Route::post('/debug-auth', [\App\Http\Controllers\AuthController::class, 'debugLogin']);
-
-// DEBUG: check request object identity
-Route::post('/debug-obj', function(\Illuminate\Http\Request $req) {
-    return response()->json([
-        'obj_id' => spl_object_id($req),
-        'content' => $req->getContent(),
-        'json_all' => $req->json()->all(),
-    ]);
-});
