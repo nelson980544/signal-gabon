@@ -53,3 +53,12 @@ Route::post('/debug-login', function(\Illuminate\Http\Request $req) {
 
 // DEBUG ROUTE 3 - simulate AuthController
 Route::post('/debug-auth', [\App\Http\Controllers\AuthController::class, 'debugLogin']);
+
+// DEBUG: check request object identity
+Route::post('/debug-obj', function(\Illuminate\Http\Request $req) {
+    return response()->json([
+        'obj_id' => spl_object_id($req),
+        'content' => $req->getContent(),
+        'json_all' => $req->json()->all(),
+    ]);
+});
