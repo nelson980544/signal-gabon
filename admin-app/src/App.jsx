@@ -7,6 +7,8 @@ import Signalements from './pages/Signalements'
 import SignalementDetail from './pages/SignalementDetail'
 import StatsAdmin from './pages/StatsAdmin'
 import Agents from './pages/Agents'
+import Guide from './pages/Guide'
+import GuideAgent from './pages/GuideAgent'
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth()
@@ -24,6 +26,9 @@ export default function App() {
         <Route path="signalements/:id" element={<SignalementDetail />} />
         <Route path="stats" element={<StatsAdmin />} />
         <Route path="agents" element={<Agents />} />
+        {/* Guide visible uniquement aux superviseurs */}
+        <Route path="guide" element={<Guide />} />
+        <Route path="guide-agent" element={<GuideAgent />} />
       </Route>
     </Routes>
   )

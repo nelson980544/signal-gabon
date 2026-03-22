@@ -1,5 +1,10 @@
 <?php
 
+// Supprimer les warnings/deprecated de la sortie HTTP (PHP 8.5)
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ERROR | E_PARSE);
+
 // ── Configuration Vercel ──────────────────────────────────────────────────────
 $tmpStorage = '/tmp/laravel-storage';
 
@@ -24,7 +29,6 @@ if (!file_exists($dbDest)) {
 }
 
 // Correctif Vercel : Symfony calcule le path relatif à SCRIPT_NAME.
-// On simule un script à la racine pour avoir le bon PATH_INFO incluant /api/.
 $_SERVER['SCRIPT_NAME']     = '/index.php';
 $_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/../public/index.php';
 $_SERVER['PHP_SELF']        = '/index.php';
@@ -38,7 +42,6 @@ $envVars = [
     'LOG_CHANNEL'          => 'stderr',
     'APP_ENV'              => 'production',
     'APP_DEBUG'            => 'false',
-    // Rediriger tous les caches vers /tmp (bootstrap/cache est read-only sur Vercel)
     'VIEW_COMPILED_PATH'   => $tmpStorage . '/framework/views',
     'APP_SERVICES_CACHE'   => '/tmp/services.php',
     'APP_PACKAGES_CACHE'   => '/tmp/packages.php',
@@ -53,5 +56,14 @@ foreach ($envVars as $key => $value) {
     putenv("$key=$value");
 }
 
-// ── Bootstrap Laravel ─────────────────────────────────────────────────────────
-require_once __DIR__ . '/../public/index.php';
+// ── Bootstrap Laravel ──────────────────────────────────────────────────────
+define('LARAVEL_START', microtime(true));
+
+if (file_exists($maintenance = __DIR__ . '/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+(require_once __DIR__ . '/../bootstrap/app.php')
+    ->handleRequest(\Illuminate\Http\Request::capture());

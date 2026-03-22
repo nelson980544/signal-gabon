@@ -42,6 +42,12 @@ export default function Layout() {
           {user?.role === 'superviseur' && (
             <NavLink to="/agents" className={navClass}>👥 Agents</NavLink>
           )}
+          {user?.role === 'superviseur' && (
+            <NavLink to="/guide" className={navClass}>📖 Guide</NavLink>
+          )}
+          {user?.role === 'agent' && (
+            <NavLink to="/guide-agent" className={navClass}>📖 Guide</NavLink>
+          )}
         </nav>
 
         <div className="p-3 border-t border-white/10">

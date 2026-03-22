@@ -6,7 +6,7 @@ export const getToken = () => token
 export const clearToken = () => { token = null }
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').trim()
 })
 
 api.interceptors.request.use(config => {
