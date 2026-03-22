@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../AuthContext'
 import api from '../api'
+import SessionWarning from './SessionWarning'
 
 export default function Layout() {
   const { user, logout } = useAuth()
@@ -64,6 +65,8 @@ export default function Layout() {
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
+
+      <SessionWarning />
     </div>
   )
 }

@@ -20,7 +20,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Compte désactivé'], 403);
         }
 
-        $token = $user->createToken('agent-token', ['*'], now()->addHours(8))->plainTextToken;
+        $token = $user->createToken('agent-token', ['*'], now()->addHours(6))->plainTextToken;
 
         return response()->json([
             'token' => $token,
@@ -30,6 +30,19 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'role' => $user->role,
             ]
+        ]);
+    }
+
+    public function refresh(Request $request)
+    {
+        $user = $request->user();
+        // Révoquer l'ancien token et en émettre un nouveau de 6h
+        $request->user()->currentAccessToken()->delete();
+        $token = $user->createToken('agent-token', ['*'], now()->addHours(6))->plainTextToken;
+
+        return response()->json([
+            'token'      => $token,
+            'expires_at' => now()->addHours(6)->toISOString(),
         ]);
     }
 

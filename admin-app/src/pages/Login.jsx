@@ -17,7 +17,9 @@ export default function Login() {
     try {
       const r = await api.post('/auth/login', { email, password })
       login(r.data.user, r.data.token)
-      navigate('/dashboard')
+      const redirect = sessionStorage.getItem('sg_redirect_after_login')
+      if (redirect) { sessionStorage.removeItem('sg_redirect_after_login'); navigate(redirect) }
+      else navigate('/dashboard')
     } catch (err) {
       setErreur(err.response?.data?.message || 'Erreur de connexion. Vérifiez vos identifiants.')
     } finally { setLoading(false) }
