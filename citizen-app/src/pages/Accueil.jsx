@@ -19,6 +19,7 @@ export default function Accueil() {
           <Link to="/signaler" className="hover:text-jaune">Signaler</Link>
           <Link to="/suivi" className="hover:text-jaune">Suivre mon dossier</Link>
           <Link to="/stats" className="hover:text-jaune">Statistiques</Link>
+          <Link to="/guide" className="hover:text-jaune">Guide</Link>
         </div>
       </nav>
 
@@ -39,6 +40,9 @@ export default function Accueil() {
           </Link>
           <Link to="/stats" className="block w-full border border-white/50 text-white/80 text-center py-3 rounded-xl text-sm">
             📊 Statistiques publiques
+          </Link>
+          <Link to="/guide" className="block w-full border border-white/30 text-white/60 text-center py-3 rounded-xl text-sm">
+            📖 Guide utilisateur
           </Link>
         </div>
         <div className="mt-8 bg-white/10 rounded-xl p-4 text-center max-w-sm w-full">
@@ -134,6 +138,7 @@ export default function Accueil() {
                   <Link to="/signaler" className="block hover:text-white">Faire un signalement</Link>
                   <Link to="/suivi" className="block hover:text-white">Suivre un dossier</Link>
                   <Link to="/stats" className="block hover:text-white">Statistiques publiques</Link>
+                  <Link to="/guide" className="block hover:text-white">Guide utilisateur</Link>
                 </div>
               </div>
               <div>

@@ -4,6 +4,7 @@ import Signaler from './pages/Signaler'
 import Confirmation from './pages/Confirmation'
 import Suivi from './pages/Suivi'
 import Stats from './pages/Stats'
+import Guide from './pages/Guide'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Route path="/confirmation" element={<Confirmation />} />
       <Route path="/suivi" element={<Suivi />} />
       <Route path="/stats" element={<Stats />} />
+      <Route path="/guide" element={<Guide />} />
     </Routes>
   )
 }
