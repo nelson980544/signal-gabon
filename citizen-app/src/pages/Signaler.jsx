@@ -31,17 +31,19 @@ export default function Signaler() {
   const soumettre = async () => {
     setLoading(true); setErreur('')
     try {
-      const r = await api.post('/signalements', {
-        categorie: form.categorie, description: form.description,
-        date_faits: form.date_faits, province: form.province, ville: form.ville
+      // Upload atomique : données texte + fichiers en un seul FormData
+      const fd = new FormData()
+      fd.append('categorie', form.categorie)
+      fd.append('description', form.description)
+      fd.append('date_faits', form.date_faits)
+      fd.append('province', form.province)
+      fd.append('ville', form.ville)
+      form.fichiers.forEach(f => fd.append('fichiers[]', f))
+
+      const r = await api.post('/signalements', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       })
-      const code = r.data.code
-      if (form.fichiers.length > 0) {
-        const fd = new FormData()
-        form.fichiers.forEach(f => fd.append('fichiers[]', f))
-        await api.post(`/signalements/${code}/preuves`, fd)
-      }
-      navigate('/confirmation', { state: { code } })
+      navigate('/confirmation', { state: { code: r.data.code } })
     } catch (e) {
       setErreur(e.response?.data?.message || 'Une erreur est survenue')
     } finally { setLoading(false) }

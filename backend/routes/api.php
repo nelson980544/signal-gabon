@@ -8,7 +8,7 @@ use App\Http\Controllers\AdminAgentController;
 use Illuminate\Support\Facades\Route;
 
 // Auth
-Route::post('/auth/login', [AuthController::class, 'login']);
+Route::middleware('throttle:5,1')->post('/auth/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
@@ -16,9 +16,9 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // Public
-Route::post('/signalements', [SignalementPublicController::class, 'store']);
-Route::get('/signalements/{code}/statut', [SignalementPublicController::class, 'statut']);
-Route::post('/signalements/{code}/preuves', [SignalementPublicController::class, 'storePreuves']);
+Route::middleware('throttle:10,1')->post('/signalements', [SignalementPublicController::class, 'store']);
+Route::middleware('throttle:30,1')->get('/signalements/{code}/statut', [SignalementPublicController::class, 'statut']);
+Route::middleware('throttle:10,1')->post('/signalements/{code}/preuves', [SignalementPublicController::class, 'storePreuves']);
 Route::get('/stats/publiques', [AdminStatController::class, 'publiques']);
 
 // Admin (auth)

@@ -1,6 +1,8 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import api from '../api'
+
+const STORAGE_KEY = 'signalGabon_codes'
 
 const STATUTS = [
   { id: 'recu', label: 'Reçu', icon: '🟢' },
@@ -16,7 +18,18 @@ export default function Suivi() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [erreur, setErreur] = useState('')
+  const [codesLocaux, setCodesLocaux] = useState([])
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Pré-remplir depuis la navigation (link depuis Confirmation) ou localStorage
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+    setCodesLocaux(saved)
+    // Priorité : code passé via state (lien depuis Confirmation) > dernier code localStorage
+    const prefill = location.state?.code || saved[0] || ''
+    if (prefill) setCode(prefill)
+  }, [location.state?.code])
 
   const rechercher = async () => {
     if (!code.trim()) { setErreur('Veuillez saisir votre code de suivi'); return }
@@ -68,6 +81,22 @@ export default function Suivi() {
             </button>
           </div>
           {erreur && <p className="text-red-500 text-sm mt-3 bg-red-50 rounded-lg p-2">{erreur}</p>}
+          {codesLocaux.length > 0 && !result && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-500 mb-2">💾 Codes sauvegardés sur cet appareil :</p>
+              <div className="flex flex-wrap gap-2">
+                {codesLocaux.map(c => (
+                  <button
+                    key={c}
+                    onClick={() => { setCode(c); setResult(null); setErreur('') }}
+                    className={`font-mono text-xs px-3 py-1.5 rounded-lg border transition ${c === code ? 'bg-bleu text-white border-bleu' : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-bleu hover:text-bleu'}`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {result && (

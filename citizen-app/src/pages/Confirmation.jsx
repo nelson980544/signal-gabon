@@ -1,10 +1,23 @@
 import { useLocation, Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+const STORAGE_KEY = 'signalGabon_codes'
 
 export default function Confirmation() {
   const { state } = useLocation()
   const code = state?.code || 'SG-XXXX-XXXX'
   const [copie, setCopie] = useState(false)
+  const [anciensCodes, setAnciensCodes] = useState([])
+
+  // Sauvegarder le code dès l'affichage de la page
+  useEffect(() => {
+    if (!state?.code) return
+    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+    // Éviter les doublons et limiter à 5 codes
+    const updated = [state.code, ...existing.filter(c => c !== state.code)].slice(0, 5)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+    setAnciensCodes(updated.filter(c => c !== state.code))
+  }, [state?.code])
 
   const copier = () => {
     navigator.clipboard.writeText(code).then(() => {
@@ -34,11 +47,30 @@ export default function Confirmation() {
           {copie ? '✓ Code copié dans le presse-papier !' : '📋 Copier le code'}
         </button>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 text-left">
-          <p className="text-sm text-yellow-800">
-            ⚠️ <strong>Conservez ce code.</strong> C'est le seul moyen de suivre votre dossier. Il n'est pas possible de le récupérer si vous le perdez.
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 text-left">
+          <p className="text-sm text-green-800">
+            💾 <strong>Code sauvegardé automatiquement</strong> sur cet appareil. Vous pourrez le retrouver sur la page "Suivre mon dossier".
           </p>
         </div>
+
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 text-left">
+          <p className="text-sm text-yellow-800">
+            ⚠️ <strong>Notez aussi ce code.</strong> La sauvegarde locale peut être effacée si vous videz votre navigateur.
+          </p>
+        </div>
+
+        {anciensCodes.length > 0 && (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 text-left">
+            <p className="text-xs font-semibold text-gray-500 mb-2">📂 Vos dossiers précédents</p>
+            <div className="space-y-1">
+              {anciensCodes.map(c => (
+                <Link key={c} to="/suivi" state={{ code: c }} className="block font-mono text-sm text-bleu hover:underline">
+                  {c}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <Link
           to="/suivi"
@@ -53,3 +85,4 @@ export default function Confirmation() {
     </div>
   )
 }
+
