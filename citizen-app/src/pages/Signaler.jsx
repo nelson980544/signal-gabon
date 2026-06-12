@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import api from '../api'
+import Tooltip from '../components/Tooltip'
 
 const CATEGORIES = [
   { id: 'Administration publique', icon: '🏛️' },
@@ -73,12 +74,15 @@ export default function Signaler() {
 
       <div className="max-w-2xl md:max-w-3xl mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6">
-          <button
-            onClick={() => etape > 1 ? setEtape(e => e - 1) : navigate('/')}
-            className="text-bleu hover:text-blue-700 font-medium"
-          >
-            ← Retour
-          </button>
+          <Tooltip texte={etape > 1 ? "Revenir à l'étape précédente" : "Revenir à la page d'accueil"}>
+            <button
+              onClick={() => etape > 1 ? setEtape(e => e - 1) : navigate('/')}
+              aria-label={etape > 1 ? "Revenir à l'étape précédente" : "Revenir à la page d'accueil"}
+              className="text-bleu hover:text-blue-700 font-medium"
+            >
+              ← Retour
+            </button>
+          </Tooltip>
           <h1 className="text-xl font-bold text-bleu flex-1 text-center">Nouveau signalement</h1>
           <div className="w-16" />
         </div>
@@ -101,6 +105,7 @@ export default function Signaler() {
               {CATEGORIES.map(c => (
                 <button
                   key={c.id}
+                  title={`Choisir la catégorie « ${c.id} » et passer à la description`}
                   onClick={() => { setForm(f => ({ ...f, categorie: c.id })); setEtape(2) }}
                   className={`p-4 rounded-xl border-2 text-center transition-all ${form.categorie === c.id ? 'border-vert bg-vert/10' : 'border-gray-200 bg-white hover:border-vert hover:shadow-sm'}`}
                 >
@@ -163,7 +168,7 @@ export default function Signaler() {
               </div>
             </div>
             {erreur && <p className="text-red-500 text-sm bg-red-50 rounded-lg p-3">{erreur}</p>}
-            <button onClick={etapesSuivantes} className="w-full bg-vert text-white py-4 rounded-xl font-bold text-lg mt-2">
+            <button onClick={etapesSuivantes} title="Valider la description et passer à l'ajout de preuves" className="w-full bg-vert text-white py-4 rounded-xl font-bold text-lg mt-2">
               Continuer →
             </button>
           </div>
@@ -200,10 +205,13 @@ export default function Signaler() {
                       <span className="truncate text-gray-700">{f.name}</span>
                       <span className="text-xs text-gray-400 flex-shrink-0">({(f.size / 1024 / 1024).toFixed(1)} Mo)</span>
                     </div>
-                    <button
-                      onClick={() => setForm(fm => ({ ...fm, fichiers: fm.fichiers.filter((_, j) => j !== i) }))}
-                      className="text-red-400 hover:text-red-600 ml-2 flex-shrink-0 font-bold"
-                    >✕</button>
+                    <Tooltip texte={`Retirer le fichier « ${f.name} »`} className="ml-2 flex-shrink-0 inline-flex">
+                      <button
+                        onClick={() => setForm(fm => ({ ...fm, fichiers: fm.fichiers.filter((_, j) => j !== i) }))}
+                        aria-label={`Retirer le fichier ${f.name}`}
+                        className="text-red-400 hover:text-red-600 font-bold"
+                      >✕</button>
+                    </Tooltip>
                   </div>
                 ))}
               </div>
@@ -212,12 +220,14 @@ export default function Signaler() {
             <div className="flex gap-3 pt-2">
               <button
                 onClick={() => { setErreur(''); setEtape(4) }}
+                title="Continuer sans ajouter de preuves (vous pourrez quand même soumettre)"
                 className="flex-1 border-2 border-gray-300 text-gray-700 py-4 rounded-xl font-medium hover:bg-gray-50"
               >
                 Passer cette étape →
               </button>
               <button
                 onClick={() => { setErreur(''); setEtape(4) }}
+                title="Passer au récapitulatif avant l'envoi"
                 className="flex-1 bg-vert text-white py-4 rounded-xl font-bold"
               >
                 Continuer →
@@ -280,6 +290,7 @@ export default function Signaler() {
                 soumettre()
               }}
               disabled={loading}
+              title="Envoyer définitivement votre signalement anonyme à la CNLCEI"
               className="w-full bg-vert text-white py-4 rounded-xl font-bold text-lg disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? '⏳ Envoi en cours...' : '📤 Soumettre mon signalement'}

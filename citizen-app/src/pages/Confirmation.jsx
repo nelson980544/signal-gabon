@@ -42,6 +42,7 @@ export default function Confirmation() {
 
         <button
           onClick={copier}
+          title="Copier le code de suivi dans le presse-papier"
           className={`w-full py-3 rounded-xl font-medium mb-4 transition-all ${copie ? 'bg-vert text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
         >
           {copie ? '✓ Code copié dans le presse-papier !' : '📋 Copier le code'}
@@ -74,11 +75,12 @@ export default function Confirmation() {
 
         <Link
           to="/suivi"
+          title="Consulter l'avancement de votre dossier avec ce code"
           className="block w-full bg-bleu text-white py-3 rounded-xl font-bold hover:bg-blue-800 transition mb-3"
         >
           🔍 Suivre mon dossier →
         </Link>
-        <Link to="/" className="block text-gray-500 text-sm hover:text-gray-700">
+        <Link to="/" title="Revenir à la page d'accueil" className="block text-gray-500 text-sm hover:text-gray-700">
           ← Retour à l'accueil
         </Link>
       </div>

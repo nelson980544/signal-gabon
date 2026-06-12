@@ -72,6 +72,7 @@ export default function SignalementDetail() {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate('/signalements')}
+          title="Revenir à la liste des signalements"
           className="text-blue-600 hover:underline text-sm font-medium"
         >
           ← Retour aux signalements
@@ -178,6 +179,7 @@ export default function SignalementDetail() {
           <button
             onClick={save}
             disabled={saving}
+            title="Sauvegarder le statut, l'attribution et le message au citoyen"
             className={`w-full py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-60 ${
               saved ? 'bg-green-500 text-white' : 'bg-blue-900 text-white hover:bg-blue-800'
             }`}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import api from '../api'
+import Tooltip from '../components/Tooltip'
 
 const STORAGE_KEY = 'signalGabon_codes'
 
@@ -56,7 +57,9 @@ export default function Suivi() {
 
       <div className="max-w-xl md:max-w-3xl mx-auto px-4 py-8">
         <div className="flex items-center gap-2 mb-6 md:hidden">
-          <button onClick={() => navigate('/')} className="text-bleu font-medium">← Retour</button>
+          <Tooltip texte="Revenir à la page d'accueil">
+            <button onClick={() => navigate('/')} aria-label="Revenir à la page d'accueil" className="text-bleu font-medium">← Retour</button>
+          </Tooltip>
           <h1 className="text-xl font-bold text-bleu flex-1 text-center">Suivre mon dossier</h1>
           <div className="w-16" />
         </div>
@@ -72,13 +75,16 @@ export default function Suivi() {
               placeholder="SG-XXXX-XXXX"
               className="flex-1 border rounded-xl px-4 py-3 font-mono text-sm focus:ring-2 focus:ring-bleu outline-none uppercase tracking-widest"
             />
-            <button
-              onClick={rechercher}
-              disabled={loading}
-              className="bg-bleu text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-800 disabled:opacity-60 transition"
-            >
-              {loading ? '⏳' : '🔍'}
-            </button>
+            <Tooltip texte="Rechercher mon dossier avec ce code">
+              <button
+                onClick={rechercher}
+                disabled={loading}
+                aria-label="Rechercher mon dossier avec ce code"
+                className="bg-bleu text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-800 disabled:opacity-60 transition"
+              >
+                {loading ? '⏳' : '🔍'}
+              </button>
+            </Tooltip>
           </div>
           {erreur && <p className="text-red-500 text-sm mt-3 bg-red-50 rounded-lg p-2">{erreur}</p>}
           {codesLocaux.length > 0 && !result && (
@@ -88,6 +94,7 @@ export default function Suivi() {
                 {codesLocaux.map(c => (
                   <button
                     key={c}
+                    title={`Remplir le champ avec le code ${c}`}
                     onClick={() => { setCode(c); setResult(null); setErreur('') }}
                     className={`font-mono text-xs px-3 py-1.5 rounded-lg border transition ${c === code ? 'bg-bleu text-white border-bleu' : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-bleu hover:text-bleu'}`}
                   >
