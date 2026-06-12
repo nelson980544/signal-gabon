@@ -65,7 +65,7 @@ export default function Confirmation() {
             <p className="text-xs font-semibold text-gray-500 mb-2">📂 Vos dossiers précédents</p>
             <div className="space-y-1">
               {anciensCodes.map(c => (
-                <Link key={c} to="/suivi" state={{ code: c }} className="block font-mono text-sm text-bleu hover:underline">
+                <Link key={c} to="/suivi" state={{ code: c }} title={`Consulter l'avancement du dossier ${c}`} className="block font-mono text-sm text-bleu hover:underline">
                   {c}
                 </Link>
               ))}

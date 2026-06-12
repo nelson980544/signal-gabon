@@ -20,17 +20,17 @@ export default function Stats() {
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="hidden md:flex bg-bleu text-white px-8 py-4 items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-jaune">🛡️ SignalGabon</Link>
+        <Link to="/" title="Revenir à la page d'accueil" className="text-2xl font-bold text-jaune">🛡️ SignalGabon</Link>
         <div className="flex gap-6 text-sm">
-          <Link to="/" className="hover:text-jaune">Accueil</Link>
-          <Link to="/signaler" className="hover:text-jaune">Signaler</Link>
-          <Link to="/suivi" className="hover:text-jaune">Suivre</Link>
+          <Link to="/" title="Revenir à la page d'accueil" className="hover:text-jaune">Accueil</Link>
+          <Link to="/signaler" title="Déclarer anonymement un fait de corruption" className="hover:text-jaune">Signaler</Link>
+          <Link to="/suivi" title="Vérifier l'avancement d'un signalement avec votre code" className="hover:text-jaune">Suivre</Link>
         </div>
       </nav>
 
       <div className="max-w-xl md:max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center gap-2 mb-6 md:hidden">
-          <button onClick={() => navigate('/')} className="text-bleu font-medium">← Retour</button>
+          <button onClick={() => navigate('/')} title="Revenir à la page d'accueil" aria-label="Revenir à la page d'accueil" className="text-bleu font-medium">← Retour</button>
           <h1 className="text-xl font-bold text-bleu flex-1 text-center">Statistiques publiques</h1>
           <div className="w-16" />
         </div>

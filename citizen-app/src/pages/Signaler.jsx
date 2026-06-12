@@ -65,10 +65,10 @@ export default function Signaler() {
     <div className="min-h-screen bg-gray-50">
       {/* Desktop navbar */}
       <nav className="hidden md:flex bg-bleu text-white px-8 py-4 items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-jaune">🛡️ SignalGabon</Link>
+        <Link to="/" title="Revenir à la page d'accueil" className="text-2xl font-bold text-jaune">🛡️ SignalGabon</Link>
         <div className="flex gap-6 text-sm">
-          <Link to="/" className="hover:text-jaune">Accueil</Link>
-          <Link to="/suivi" className="hover:text-jaune">Suivre mon dossier</Link>
+          <Link to="/" title="Revenir à la page d'accueil" className="hover:text-jaune">Accueil</Link>
+          <Link to="/suivi" title="Vérifier l'avancement d'un signalement avec votre code" className="hover:text-jaune">Suivre mon dossier</Link>
         </div>
       </nav>
 

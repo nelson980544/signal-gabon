@@ -48,10 +48,10 @@ export default function Suivi() {
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="hidden md:flex bg-bleu text-white px-8 py-4 items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-jaune">🛡️ SignalGabon</Link>
+        <Link to="/" title="Revenir à la page d'accueil" className="text-2xl font-bold text-jaune">🛡️ SignalGabon</Link>
         <div className="flex gap-6 text-sm">
-          <Link to="/" className="hover:text-jaune">Accueil</Link>
-          <Link to="/signaler" className="hover:text-jaune">Faire un signalement</Link>
+          <Link to="/" title="Revenir à la page d'accueil" className="hover:text-jaune">Accueil</Link>
+          <Link to="/signaler" title="Déclarer anonymement un fait de corruption" className="hover:text-jaune">Faire un signalement</Link>
         </div>
       </nav>
 

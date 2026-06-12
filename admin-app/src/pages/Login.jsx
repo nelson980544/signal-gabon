@@ -66,6 +66,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
+            title="Se connecter à l'interface d'administration CNLCEI"
             className="w-full bg-blue-900 text-white py-3 rounded-xl font-bold hover:bg-blue-800 disabled:opacity-60 transition text-sm"
           >
             {loading ? 'Connexion en cours...' : 'Se connecter'}

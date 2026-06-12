@@ -15,11 +15,11 @@ export default function Accueil() {
           <span className="text-sm opacity-75">CNLCEI</span>
         </div>
         <div className="flex gap-6 text-sm font-medium">
-          <Link to="/" className="hover:text-jaune">Accueil</Link>
-          <Link to="/signaler" className="hover:text-jaune">Signaler</Link>
-          <Link to="/suivi" className="hover:text-jaune">Suivre mon dossier</Link>
-          <Link to="/stats" className="hover:text-jaune">Statistiques</Link>
-          <Link to="/guide" className="hover:text-jaune">Guide</Link>
+          <Link to="/" title="Revenir à la page d'accueil" className="hover:text-jaune">Accueil</Link>
+          <Link to="/signaler" title="Déclarer anonymement un fait de corruption" className="hover:text-jaune">Signaler</Link>
+          <Link to="/suivi" title="Vérifier l'avancement d'un signalement avec votre code" className="hover:text-jaune">Suivre mon dossier</Link>
+          <Link to="/stats" title="Consulter les chiffres publics de la plateforme" className="hover:text-jaune">Statistiques</Link>
+          <Link to="/guide" title="Apprendre à utiliser la plateforme pas à pas" className="hover:text-jaune">Guide</Link>
         </div>
       </nav>
 
@@ -135,10 +135,10 @@ export default function Accueil() {
               <div>
                 <h3 className="font-bold text-jaune mb-3">Navigation</h3>
                 <div className="space-y-1 text-sm text-white/70">
-                  <Link to="/signaler" className="block hover:text-white">Faire un signalement</Link>
-                  <Link to="/suivi" className="block hover:text-white">Suivre un dossier</Link>
-                  <Link to="/stats" className="block hover:text-white">Statistiques publiques</Link>
-                  <Link to="/guide" className="block hover:text-white">Guide utilisateur</Link>
+                  <Link to="/signaler" title="Déclarer anonymement un fait de corruption" className="block hover:text-white">Faire un signalement</Link>
+                  <Link to="/suivi" title="Vérifier l'avancement d'un signalement avec votre code" className="block hover:text-white">Suivre un dossier</Link>
+                  <Link to="/stats" title="Consulter les chiffres publics de la plateforme" className="block hover:text-white">Statistiques publiques</Link>
+                  <Link to="/guide" title="Apprendre à utiliser la plateforme pas à pas" className="block hover:text-white">Guide utilisateur</Link>
                 </div>
               </div>
               <div>

@@ -56,15 +56,15 @@ export default function Guide() {
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
       <nav className="bg-bleu text-white px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-md">
-        <Link to="/" className="flex items-center gap-3">
+        <Link to="/" title="Revenir à la page d'accueil" className="flex items-center gap-3">
           <span className="text-xl font-bold text-jaune">🛡️ SignalGabon</span>
           <span className="text-xs opacity-75 hidden sm:inline">CNLCEI</span>
         </Link>
         <div className="flex gap-4 text-sm font-medium">
-          <Link to="/" className="hover:text-jaune transition hidden sm:inline">Accueil</Link>
-          <Link to="/signaler" className="hover:text-jaune transition hidden sm:inline">Signaler</Link>
-          <Link to="/suivi" className="hover:text-jaune transition hidden sm:inline">Suivre mon dossier</Link>
-          <Link to="/guide" className="text-jaune font-semibold">Guide</Link>
+          <Link to="/" title="Revenir à la page d'accueil" className="hover:text-jaune transition hidden sm:inline">Accueil</Link>
+          <Link to="/signaler" title="Déclarer anonymement un fait de corruption" className="hover:text-jaune transition hidden sm:inline">Signaler</Link>
+          <Link to="/suivi" title="Vérifier l'avancement d'un signalement avec votre code" className="hover:text-jaune transition hidden sm:inline">Suivre mon dossier</Link>
+          <Link to="/guide" title="Vous êtes sur le guide utilisateur" className="text-jaune font-semibold">Guide</Link>
         </div>
       </nav>
 
@@ -88,6 +88,7 @@ export default function Guide() {
                 <button
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
+                  title={`Aller à la section « ${item.label.trim()} »`}
                   className={`block w-full text-left text-sm px-2 py-1.5 rounded hover:bg-blue-50 hover:text-bleu transition
                     ${item.label.startsWith('   ') ? 'pl-5 text-xs text-gray-500' : 'text-gray-700 font-medium'}`}
                 >
@@ -107,6 +108,7 @@ export default function Guide() {
                 <button
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
+                  title={`Aller à la section « ${item.label.trim()} »`}
                   className={`block w-full text-left text-sm px-2 py-1.5 rounded hover:bg-blue-50 hover:text-bleu transition
                     ${item.label.startsWith('   ') ? 'pl-5 text-xs text-gray-500' : 'text-gray-700'}`}
                 >
@@ -489,6 +491,7 @@ export default function Guide() {
             <p className="text-white/80 text-sm mb-5">Anonyme · Sécurisé · En quelques minutes</p>
             <Link
               to="/signaler"
+              title="Déclarer anonymement un fait de corruption en 4 étapes"
               className="inline-block bg-white text-vert font-bold px-8 py-3 rounded-xl hover:bg-gray-50 transition"
             >
               📢 Faire un signalement
@@ -505,9 +508,9 @@ export default function Guide() {
             <p className="text-xs text-white/60">Plateforme officielle de la CNLCEI — République Gabonaise</p>
           </div>
           <div className="flex gap-6 text-sm text-white/70">
-            <Link to="/signaler" className="hover:text-white">Signaler</Link>
-            <Link to="/suivi" className="hover:text-white">Suivre mon dossier</Link>
-            <Link to="/stats" className="hover:text-white">Statistiques</Link>
+            <Link to="/signaler" title="Déclarer anonymement un fait de corruption" className="hover:text-white">Signaler</Link>
+            <Link to="/suivi" title="Vérifier l'avancement d'un signalement avec votre code" className="hover:text-white">Suivre mon dossier</Link>
+            <Link to="/stats" title="Consulter les chiffres publics de la plateforme" className="hover:text-white">Statistiques</Link>
           </div>
         </div>
         <div className="max-w-5xl mx-auto mt-6 border-t border-white/20 pt-4 text-center text-xs text-white/40">
