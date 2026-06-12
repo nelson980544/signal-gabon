@@ -32,16 +32,16 @@ export default function Accueil() {
           <p className="text-white/90 text-lg font-medium px-4">Signalez la corruption. Anonymement. En toute sécurité.</p>
         </div>
         <div className="w-full max-w-sm space-y-4">
-          <Link to="/signaler" className="block w-full bg-vert text-white text-center py-4 rounded-2xl text-lg font-bold shadow-lg">
+          <Link to="/signaler" title="Déclarer anonymement un fait de corruption en 4 étapes" className="block w-full bg-vert text-white text-center py-4 rounded-2xl text-lg font-bold shadow-lg">
             📢 Faire un signalement
           </Link>
-          <Link to="/suivi" className="block w-full border-2 border-white text-white text-center py-4 rounded-2xl text-lg font-bold">
+          <Link to="/suivi" title="Vérifier l'avancement d'un signalement avec votre code de suivi" className="block w-full border-2 border-white text-white text-center py-4 rounded-2xl text-lg font-bold">
             🔍 Suivre mon dossier
           </Link>
-          <Link to="/stats" className="block w-full border border-white/50 text-white/80 text-center py-3 rounded-xl text-sm">
+          <Link to="/stats" title="Consulter les chiffres publics de la lutte anti-corruption" className="block w-full border border-white/50 text-white/80 text-center py-3 rounded-xl text-sm">
             📊 Statistiques publiques
           </Link>
-          <Link to="/guide" className="block w-full border border-white/30 text-white/60 text-center py-3 rounded-xl text-sm">
+          <Link to="/guide" title="Apprendre à utiliser la plateforme pas à pas" className="block w-full border border-white/30 text-white/60 text-center py-3 rounded-xl text-sm">
             📖 Guide utilisateur
           </Link>
         </div>
@@ -63,10 +63,10 @@ export default function Accueil() {
               Signalez la corruption anonymement et en toute sécurité. Votre signalement aide à construire un Gabon plus juste.
             </p>
             <div className="flex gap-4 justify-center">
-              <Link to="/signaler" className="bg-vert text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-green-600 transition">
+              <Link to="/signaler" title="Déclarer anonymement un fait de corruption en 4 étapes" className="bg-vert text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-green-600 transition">
                 📢 Faire un signalement
               </Link>
-              <Link to="/suivi" className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-white/10 transition">
+              <Link to="/suivi" title="Vérifier l'avancement d'un signalement avec votre code de suivi" className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-white/10 transition">
                 🔍 Suivre mon dossier
               </Link>
             </div>

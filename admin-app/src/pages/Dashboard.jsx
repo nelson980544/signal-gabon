@@ -92,7 +92,7 @@ export default function Dashboard() {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="flex justify-between items-center px-5 py-4 border-b">
           <h2 className="font-bold text-gray-800">Derniers signalements</h2>
-          <Link to="/signalements" className="text-blue-600 text-sm hover:underline font-medium">
+          <Link to="/signalements" title="Afficher la liste complète des signalements" className="text-blue-600 text-sm hover:underline font-medium">
             Voir tout →
           </Link>
         </div>

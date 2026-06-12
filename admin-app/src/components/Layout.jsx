@@ -37,23 +37,24 @@ export default function Layout() {
         </div>
 
         <nav className="flex-1 p-3 space-y-1">
-          <NavLink to="/dashboard" className={navClass}>📊 Tableau de bord</NavLink>
-          <NavLink to="/signalements" className={navClass}>📋 Signalements</NavLink>
-          <NavLink to="/stats" className={navClass}>📈 Statistiques</NavLink>
+          <NavLink to="/dashboard" title="Vue d'ensemble : indicateurs clés et derniers signalements" className={navClass}>📊 Tableau de bord</NavLink>
+          <NavLink to="/signalements" title="Consulter, filtrer et traiter tous les signalements" className={navClass}>📋 Signalements</NavLink>
+          <NavLink to="/stats" title="Statistiques détaillées de la plateforme" className={navClass}>📈 Statistiques</NavLink>
           {user?.role === 'superviseur' && (
-            <NavLink to="/agents" className={navClass}>👥 Agents</NavLink>
+            <NavLink to="/agents" title="Liste des agents et leur charge de travail" className={navClass}>👥 Agents</NavLink>
           )}
           {user?.role === 'superviseur' && (
-            <NavLink to="/guide" className={navClass}>📖 Guide</NavLink>
+            <NavLink to="/guide" title="Guide d'utilisation pour les superviseurs" className={navClass}>📖 Guide</NavLink>
           )}
           {user?.role === 'agent' && (
-            <NavLink to="/guide-agent" className={navClass}>📖 Guide</NavLink>
+            <NavLink to="/guide-agent" title="Guide d'utilisation pour les agents" className={navClass}>📖 Guide</NavLink>
           )}
         </nav>
 
         <div className="p-3 border-t border-white/10">
           <button
             onClick={handleLogout}
+            title="Fermer la session et revenir à la page de connexion"
             className="w-full text-white/70 hover:text-white text-sm py-2 px-4 rounded-lg hover:bg-white/10 transition text-left flex items-center gap-2"
           >
             🚪 Déconnexion

@@ -82,6 +82,7 @@ export default function Signalements() {
 
           <button
             onClick={resetFiltres}
+            title="Effacer tous les filtres et revenir à la première page"
             className="text-sm text-gray-500 hover:text-gray-700 px-3 py-2 hover:bg-gray-50 rounded-lg"
           >
             ✕ Réinitialiser
@@ -132,6 +133,7 @@ export default function Signalements() {
                   <td className="px-4 py-3">
                     <Link
                       to={`/signalements/${s.id}`}
+                      title={`Ouvrir le détail du dossier ${s.code}`}
                       className="text-blue-600 hover:underline text-xs font-medium whitespace-nowrap"
                     >
                       Voir →
@@ -157,6 +159,7 @@ export default function Signalements() {
               <button
                 disabled={!data.prev_page_url}
                 onClick={() => setPage(p => p - 1)}
+                title="Afficher la page précédente de résultats"
                 className="px-3 py-1.5 border rounded-lg disabled:opacity-40 hover:bg-gray-50 text-xs"
               >
                 ← Précédent
@@ -164,6 +167,7 @@ export default function Signalements() {
               <button
                 disabled={!data.next_page_url}
                 onClick={() => setPage(p => p + 1)}
+                title="Afficher la page suivante de résultats"
                 className="px-3 py-1.5 border rounded-lg disabled:opacity-40 hover:bg-gray-50 text-xs"
               >
                 Suivant →
