@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd citizen-app && npm install",
+  "buildCommand": "cd citizen-app && npm run build",
+  "outputDirectory": "citizen-app/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
