@@ -34,11 +34,11 @@ class SignalementPublicController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'categorie'   => 'required|string',
+            'categorie'   => 'required|in:Administration publique,Police et gendarmerie,Santé et hôpitaux,Éducation et universités,Douanes et frontières,Justice et tribunaux,Marchés publics,Autre',
             'description' => 'required|string|min:50',
             'date_faits'  => 'required|date',
-            'province'    => 'required|string',
-            'ville'       => 'required|string',
+            'province'    => 'required|in:Estuaire,Haut-Ogooué,Moyen-Ogooué,Ngounié,Nyanga,Ogooué-Ivindo,Ogooué-Lolo,Ogooué-Maritime,Woleu-Ntem',
+            'ville'       => 'required|string|max:100',
             // Preuves optionnelles soumises en même temps (upload atomique)
             'fichiers'    => 'sometimes|array|max:5',
             'fichiers.*'  => 'file|max:10240|mimes:jpg,jpeg,png,pdf,mp3,mp4,wav',

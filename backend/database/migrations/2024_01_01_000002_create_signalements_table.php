@@ -8,10 +8,10 @@ return new class extends Migration {
         Schema::create('signalements', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->string('categorie');
+            $table->enum('categorie', ['Administration publique','Police et gendarmerie','Santé et hôpitaux','Éducation et universités','Douanes et frontières','Justice et tribunaux','Marchés publics','Autre']);
             $table->text('description');
             $table->date('date_faits');
-            $table->string('province');
+            $table->enum('province', ['Estuaire','Haut-Ogooué','Moyen-Ogooué','Ngounié','Nyanga','Ogooué-Ivindo','Ogooué-Lolo','Ogooué-Maritime','Woleu-Ntem']);
             $table->string('ville');
             $table->enum('statut', ['recu','en_examen','attribue','en_instruction','traite','classe'])->default('recu');
             $table->foreignId('agent_id')->nullable()->constrained('users')->nullOnDelete();
