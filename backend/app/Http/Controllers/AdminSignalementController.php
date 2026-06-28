@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Signalement;
+use App\Models\SignalementHistorique;
 use Illuminate\Http\Request;
 
 class AdminSignalementController extends Controller
@@ -29,7 +30,7 @@ class AdminSignalementController extends Controller
     public function show(Request $request, $id)
     {
         $user = $request->user();
-        $s = Signalement::with(['agent', 'preuves'])->findOrFail($id);
+        $s = Signalement::with(['agent', 'preuves', 'historiques.agent'])->findOrFail($id);
 
         if ($user->role === 'agent' && $s->agent_id !== $user->id) {
             abort(403);
@@ -57,7 +58,25 @@ class AdminSignalementController extends Controller
             unset($data['agent_id']);
         }
 
+        $ancienStatut  = $s->statut;
+        $ancienAgentId = $s->agent_id;
+
         $s->update($data);
+
+        $statutChange = isset($data['statut']) && $data['statut'] !== $ancienStatut;
+        $agentChange  = array_key_exists('agent_id', $data) && $data['agent_id'] !== $ancienAgentId;
+
+        if ($statutChange || $agentChange) {
+            SignalementHistorique::create([
+                'signalement_id'  => $s->id,
+                'agent_id'        => $user->id,
+                'ancien_statut'   => $statutChange ? $ancienStatut : null,
+                'nouveau_statut'  => $statutChange ? $s->statut : null,
+                'ancien_agent_id' => $agentChange ? $ancienAgentId : null,
+                'nouveau_agent_id'=> $agentChange ? $s->agent_id : null,
+                'commentaire'     => $data['message_agent'] ?? null,
+            ]);
+        }
 
         return response()->json($s->load('agent'));
     }

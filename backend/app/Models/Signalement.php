@@ -24,6 +24,11 @@ class Signalement extends Model
         return $this->hasMany(Preuve::class);
     }
 
+    public function historiques()
+    {
+        return $this->hasMany(SignalementHistorique::class)->orderBy('created_at', 'asc');
+    }
+
     public function scopeForAgent($query, User $user)
     {
         if ($user->role === 'agent') {
