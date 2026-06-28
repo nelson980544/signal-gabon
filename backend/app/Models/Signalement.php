@@ -11,7 +11,7 @@ class Signalement extends Model
 
     protected $fillable = [
         'code', 'categorie', 'description', 'date_faits',
-        'province', 'ville', 'statut', 'agent_id', 'message_agent'
+        'province', 'ville', 'statut', 'agent_id', 'message_agent', 'email_contact',
     ];
 
     public function agent()

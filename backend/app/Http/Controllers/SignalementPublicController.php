@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Signalement;
 use App\Models\Preuve;
+use App\Models\Signalement;
+use App\Services\ImageSanitizer;
 use Illuminate\Http\Request;
 
 class SignalementPublicController extends Controller
@@ -24,7 +25,7 @@ class SignalementPublicController extends Controller
     private function randomStr(int $length, string $chars): string
     {
         $result = '';
-        $max = strlen($chars) - 1;
+        $max    = strlen($chars) - 1;
         for ($i = 0; $i < $length; $i++) {
             $result .= $chars[random_int(0, $max)];
         }
@@ -34,27 +35,29 @@ class SignalementPublicController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'categorie'   => 'required|in:Administration publique,Police et gendarmerie,Santé et hôpitaux,Éducation et universités,Douanes et frontières,Justice et tribunaux,Marchés publics,Autre',
-            'description' => 'required|string|min:50',
-            'date_faits'  => 'required|date',
-            'province'    => 'required|in:Estuaire,Haut-Ogooué,Moyen-Ogooué,Ngounié,Nyanga,Ogooué-Ivindo,Ogooué-Lolo,Ogooué-Maritime,Woleu-Ntem',
-            'ville'       => 'required|string|max:100',
+            'categorie'     => 'required|in:Administration publique,Police et gendarmerie,Santé et hôpitaux,Éducation et universités,Douanes et frontières,Justice et tribunaux,Marchés publics,Autre',
+            'description'   => 'required|string|min:50',
+            'date_faits'    => 'required|date',
+            'province'      => 'required|in:Estuaire,Haut-Ogooué,Moyen-Ogooué,Ngounié,Nyanga,Ogooué-Ivindo,Ogooué-Lolo,Ogooué-Maritime,Woleu-Ntem',
+            'ville'         => 'required|string|max:100',
+            'email_contact' => 'sometimes|nullable|email|max:255',
             // Preuves optionnelles soumises en même temps (upload atomique)
-            'fichiers'    => 'sometimes|array|max:5',
-            'fichiers.*'  => 'file|max:10240|mimes:jpg,jpeg,png,pdf,mp3,mp4,wav',
+            'fichiers'      => 'sometimes|array|max:5',
+            'fichiers.*'    => 'file|max:10240|mimes:jpg,jpeg,png,pdf,mp3,mp4,wav',
         ]);
 
         $fileData = $request->file('fichiers', []);
 
-        $signalementData = collect($validated)->except('fichiers')->toArray();
-        $signalementData['code']   = $this->generateCode();
+        $signalementData         = collect($validated)->except('fichiers')->toArray();
+        $signalementData['code'] = $this->generateCode();
         $signalementData['statut'] = 'recu';
 
         $s = Signalement::create($signalementData);
 
-        // Attacher les preuves immédiatement si fournies (atomique)
+        // Supprimer les EXIF et stocker via le disk configuré (local ou S3/R2)
         foreach ($fileData as $file) {
-            $path = $file->store("preuves/{$s->code}", 'local');
+            ImageSanitizer::strip($file->getRealPath());
+            $path = $file->store("preuves/{$s->code}");
             Preuve::create([
                 'signalement_id' => $s->id,
                 'nom_fichier'    => $file->getClientOriginalName(),
@@ -89,14 +92,22 @@ class SignalementPublicController extends Controller
     {
         $s = Signalement::where('code', $code)->firstOrFail();
 
+        // Vérifier la limite totale (10 preuves max par signalement)
+        $existantes = $s->preuves()->count();
+
         $request->validate([
-            'fichiers'   => 'required|array|max:5',
+            'fichiers'   => 'required|array|max:' . max(1, 10 - $existantes),
             'fichiers.*' => 'file|max:10240|mimes:jpg,jpeg,png,pdf,mp3,mp4,wav',
         ]);
 
+        if ($existantes >= 10) {
+            return response()->json(['message' => 'Limite de 10 preuves atteinte pour ce signalement'], 422);
+        }
+
         $preuves = [];
         foreach ($request->file('fichiers') as $file) {
-            $path = $file->store("preuves/{$code}", 'local');
+            ImageSanitizer::strip($file->getRealPath());
+            $path      = $file->store("preuves/{$code}");
             $preuves[] = Preuve::create([
                 'signalement_id' => $s->id,
                 'nom_fichier'    => $file->getClientOriginalName(),
