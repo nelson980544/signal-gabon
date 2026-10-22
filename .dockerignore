@@ -1,0 +1,29 @@
+# Contexte de build de deploy/Dockerfile (la racine du dépôt).
+# Rien de ce qui suit n'a sa place dans l'image.
+
+.git
+.github
+
+# Secrets : le .env du serveur ne doit jamais être copié dans une couche d'image.
+# La configuration est injectée au démarrage par docker compose (env_file).
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Données locales : des preuves déposées pendant un test local n'ont rien à
+# faire dans une image, et seraient recopiées sur le serveur au déploiement.
+backend/storage/app
+backend/database/*.sqlite
+
+# Reconstruits dans l'image
+backend/vendor
+backend/storage/logs
+backend/storage/framework/cache
+backend/bootstrap/cache
+
+# Front : déployé sur Vercel, inutile dans l'image de l'API
+citizen-app
+admin-app
+landing
+dist
+node_modules

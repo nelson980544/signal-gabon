@@ -134,6 +134,26 @@ npm run dev                   # http://localhost:5174
 
 ---
 
+## Hébergement au Gabon
+
+Les données de signalement ne doivent pas quitter le territoire : voir
+[`docs/hebergement-cahier-des-charges.md`](docs/hebergement-cahier-des-charges.md)
+(document à remettre à l'hébergeur) et
+[`docs/exploitation.md`](docs/exploitation.md) (installation et administration
+pas à pas).
+
+Le nécessaire de déploiement est dans [`deploy/`](deploy/) : pile Docker
+(nginx + php-fpm + MariaDB + certbot), sauvegarde chiffrée et restauration.
+Dans cette configuration, l'API, la base et les preuves sont sur le serveur
+gabonais ; seules les pages React restent sur Vercel.
+
+> **Comptes de démonstration et production.** Les comptes listés plus haut sont
+> créés par `php artisan db:seed`, réservé au développement. Sur un serveur de
+> production, le premier compte se crée avec
+> `php artisan cnlcei:creer-superviseur`, qui demande un mot de passe fort.
+
+---
+
 ## Déploiement (Vercel)
 
 Le dépôt se déploie en **un seul projet Vercel** pointant sur la racine. Le build
