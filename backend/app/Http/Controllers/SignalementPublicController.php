@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Preuve;
 use App\Models\Signalement;
+use App\Services\FileCrypto;
 use App\Services\ImageSanitizer;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class SignalementPublicController extends Controller
 {
@@ -32,6 +35,30 @@ class SignalementPublicController extends Controller
         return $result;
     }
 
+    /**
+     * Retire les EXIF, chiffre le fichier puis le stocke (local ou S3/R2).
+     * Le nom sur disque est aléatoire : il ne révèle ni le nom d'origine ni le type.
+     */
+    private function storePreuve(Signalement $s, UploadedFile $file): Preuve
+    {
+        $mime = $file->getMimeType();
+        $size = $file->getSize();
+        $name = $file->getClientOriginalName();
+
+        ImageSanitizer::strip($file->getRealPath());
+        $path = "preuves/{$s->code}/" . Str::uuid() . '.enc';
+        FileCrypto::encryptToDisk($file->getRealPath(), $path);
+
+        return Preuve::create([
+            'signalement_id' => $s->id,
+            'nom_fichier'    => $name,
+            'chemin'         => $path,
+            'type_fichier'   => $mime,
+            'taille'         => $size,
+            'chiffre'        => true,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -54,17 +81,8 @@ class SignalementPublicController extends Controller
 
         $s = Signalement::create($signalementData);
 
-        // Supprimer les EXIF et stocker via le disk configuré (local ou S3/R2)
         foreach ($fileData as $file) {
-            ImageSanitizer::strip($file->getRealPath());
-            $path = $file->store("preuves/{$s->code}");
-            Preuve::create([
-                'signalement_id' => $s->id,
-                'nom_fichier'    => $file->getClientOriginalName(),
-                'chemin'         => $path,
-                'type_fichier'   => $file->getMimeType(),
-                'taille'         => $file->getSize(),
-            ]);
+            $this->storePreuve($s, $file);
         }
 
         return response()->json([
@@ -106,15 +124,7 @@ class SignalementPublicController extends Controller
 
         $preuves = [];
         foreach ($request->file('fichiers') as $file) {
-            ImageSanitizer::strip($file->getRealPath());
-            $path      = $file->store("preuves/{$code}");
-            $preuves[] = Preuve::create([
-                'signalement_id' => $s->id,
-                'nom_fichier'    => $file->getClientOriginalName(),
-                'chemin'         => $path,
-                'type_fichier'   => $file->getMimeType(),
-                'taille'         => $file->getSize(),
-            ]);
+            $preuves[] = $this->storePreuve($s, $file);
         }
 
         return response()->json(['message' => count($preuves) . ' preuve(s) ajoutée(s)'], 201);

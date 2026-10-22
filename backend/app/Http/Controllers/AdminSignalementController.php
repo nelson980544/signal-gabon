@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Preuve;
 use App\Models\Signalement;
+use App\Services\FileCrypto;
 use App\Models\SignalementHistorique;
 use App\Notifications\StatutSignalementChange;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 
 class AdminSignalementController extends Controller
 {
@@ -82,5 +85,34 @@ class AdminSignalementController extends Controller
         }
 
         return response()->json($s->load('agent'));
+    }
+
+    /**
+     * Téléchargement d'une preuve : déchiffrement à la volée, réservé au
+     * superviseur et à l'agent assigné au dossier.
+     */
+    public function telechargerPreuve(Request $request, $id)
+    {
+        $preuve = Preuve::with('signalement')->findOrFail($id);
+
+        $this->authorize('view', $preuve->signalement);
+
+        $nom = str_replace(['"', "\r", "\n", '/', '\\'], '_', $preuve->nom_fichier);
+        $headers = [
+            'Content-Type'           => $preuve->type_fichier,
+            'Content-Disposition'    => 'attachment; filename="' . $nom . '"',
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control'          => 'private, no-store',
+        ];
+
+        if (! $preuve->chiffre) {
+            return Storage::download($preuve->chemin, $nom, $headers);
+        }
+
+        return response()->stream(function () use ($preuve) {
+            foreach (FileCrypto::decryptStream($preuve->chemin) as $bloc) {
+                echo $bloc;
+            }
+        }, 200, $headers);
     }
 }

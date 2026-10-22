@@ -19,7 +19,8 @@ class SignalementHistorique extends Model
     ];
 
     protected $casts = [
-        'created_at' => 'datetime',
+        'created_at'  => 'datetime',
+        'commentaire' => 'encrypted',
     ];
 
     public function agent()

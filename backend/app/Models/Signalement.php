@@ -14,6 +14,15 @@ class Signalement extends Model
         'province', 'ville', 'statut', 'agent_id', 'message_agent', 'email_contact',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'description'   => 'encrypted',
+            'message_agent' => 'encrypted',
+            'email_contact' => 'encrypted',
+        ];
+    }
+
     public function agent()
     {
         return $this->belongsTo(User::class, 'agent_id');

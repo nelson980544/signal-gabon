@@ -26,6 +26,7 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::get('/signalements', [AdminSignalementController::class, 'index']);
     Route::get('/signalements/{id}', [AdminSignalementController::class, 'show']);
     Route::patch('/signalements/{id}', [AdminSignalementController::class, 'update']);
+    Route::get('/preuves/{id}/telecharger', [AdminSignalementController::class, 'telechargerPreuve']);
     Route::get('/stats', [AdminStatController::class, 'admin']);
     Route::get('/agents', [AdminAgentController::class, 'index']);
 });

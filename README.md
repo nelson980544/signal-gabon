@@ -137,3 +137,23 @@ npm run dev                   # http://localhost:5174
 ## Licence
 
 MIT — République Gabonaise / CNLCEI — 2024
+
+---
+
+## Chiffrement des données
+
+| Donnée | Protection |
+|--------|-----------|
+| `description`, `message_agent`, `email_contact`, commentaires d'historique, noms de fichiers | Chiffrement applicatif AES-256 (casts Laravel `encrypted`, clé `APP_KEY`) |
+| Preuves (images, PDF, audio, vidéo) | libsodium XChaCha20-Poly1305 par blocs de 64 Kio, clé `FILES_ENCRYPTION_KEY`, nom aléatoire sur disque, chemin lié au chiffré |
+| Téléchargement | `GET /api/admin/preuves/{id}/telecharger`, déchiffrement à la volée, réservé au superviseur et à l'agent assigné |
+
+Mise en place :
+
+```bash
+php -r "echo base64_encode(random_bytes(32)), PHP_EOL;"   # → FILES_ENCRYPTION_KEY dans .env
+php artisan migrate            # chiffre aussi les données textuelles déjà présentes
+php artisan preuves:chiffrer   # chiffre les fichiers déjà stockés en clair (idempotent)
+```
+
+⚠️ **Sauvegardez `APP_KEY` et `FILES_ENCRYPTION_KEY` hors ligne, séparément de la base.** Perdre une clé rend les données correspondantes irrécupérables. Ne changez jamais `APP_KEY` sans renseigner `APP_PREVIOUS_KEYS`. Les champs chiffrés ne peuvent plus être filtrés ou recherchés en SQL.

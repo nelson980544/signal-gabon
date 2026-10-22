@@ -3,6 +3,22 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../AuthContext'
 import api from '../api'
 
+// Les preuves sont chiffrées côté serveur : on les récupère avec le jeton d'authentification
+// (un simple lien <a> n'enverrait pas l'en-tête Authorization), puis on déclenche l'enregistrement.
+async function telechargerPreuve(p) {
+  try {
+    const r = await api.get(`/admin/preuves/${p.id}/telecharger`, { responseType: 'blob' })
+    const url = URL.createObjectURL(r.data)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = p.nom_fichier
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch {
+    alert('Impossible de télécharger cette preuve.')
+  }
+}
+
 const STATUTS = ['recu', 'en_examen', 'attribue', 'en_instruction', 'traite', 'classe']
 const STATUT_LABELS = {
   recu: 'Reçu',
@@ -120,6 +136,13 @@ export default function SignalementDetail() {
                     <span>📄</span>
                     <span className="text-blue-700 font-medium truncate">{p.nom_fichier}</span>
                     <span className="text-gray-400 flex-shrink-0">({(p.taille / 1024).toFixed(0)} Ko)</span>
+                    <button
+                      onClick={() => telechargerPreuve(p)}
+                      title="Télécharger cette preuve (déchiffrée à la demande)"
+                      className="ml-auto text-blue-700 font-semibold hover:underline flex-shrink-0"
+                    >
+                      Télécharger
+                    </button>
                   </div>
                 ))}
               </div>
