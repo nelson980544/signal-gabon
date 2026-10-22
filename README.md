@@ -136,30 +136,49 @@ npm run dev                   # http://localhost:5174
 
 ## Déploiement (Vercel)
 
-Ce dépôt est un monorepo : il contient **trois** applications. Chacune doit avoir
-son **propre projet Vercel**, sinon Vercel ne trouve rien à servir et renvoie
-`404 NOT_FOUND`.
+Le dépôt se déploie en **un seul projet Vercel** pointant sur la racine. Le build
+(`npm run build` → `scripts/build-site.mjs`) assemble un site unifié :
 
-| Projet Vercel | Root Directory | Variables d'environnement |
-|---------------|----------------|---------------------------|
-| Site citoyen | `citizen-app` (ou la racine, voir ci-dessous) | `VITE_API_URL=https://<api>/api` |
-| Interface admin | `admin-app` | `VITE_API_URL=https://<api>/api` |
-| API Laravel | `backend` | voir `backend/.env.example` |
+| URL | Contenu |
+|-----|---------|
+| `/` | Page d'accueil : choix entre l'espace citoyen et l'espace agent |
+| `/citoyen/` | Application citoyenne (`citizen-app`) |
+| `/admin/` | Interface agents CNLCEI (`admin-app`) |
 
-Le `vercel.json` à la racine permet au projet du site citoyen de fonctionner
-même si son *Root Directory* est laissé à la racine du dépôt : il construit
-`citizen-app` et sert `citizen-app/dist`.
+Réglages du projet Vercel :
 
-Chaque application front a aussi son propre `vercel.json` avec la réécriture SPA
-(`/(.*)` → `/index.html`) nécessaire au routage React Router : sans elle, toute
-URL autre que `/` renvoie un 404.
+- **Root Directory** : la racine du dépôt (laisser vide)
+- **Framework Preset** : `Other` — tout est déjà décrit dans `vercel.json`
+- **Variables d'environnement** : `VITE_API_URL=https://<api>/api`
+  (sans elle, les deux apps appellent `http://localhost:8000/api`)
+
+Le backend Laravel se déploie séparément (voir `backend/render.yaml`,
+`backend/railway.json` ou `backend/vercel.json`).
+
+### Comment ça marche
+
+Chaque app est construite avec la variable `APP_BASE` (`/citoyen/`, `/admin/`),
+reprise par Vite (`base`) et par React Router (`basename={import.meta.env.BASE_URL}`).
+Les réécritures SPA de `vercel.json` renvoient toute URL d'un sous-chemin vers
+l'`index.html` de l'app correspondante — sans elles, un rechargement sur
+`/citoyen/suivi` renverrait un 404.
+
+Chaque app garde son propre `vercel.json` : elle peut toujours être déployée
+seule (Root Directory = `citizen-app` ou `admin-app`), et elle est alors servie
+à la racine de son domaine.
+
+### Build en local
+
+```bash
+npm run build      # depuis la racine
+npx serve dist     # ou tout serveur statique
+```
 
 ### Points de contrôle en cas de 404
 
-1. Le *Root Directory* du projet Vercel pointe bien sur le dossier de l'app.
-2. La commande de build est `npm run build` et le dossier de sortie `dist`.
-3. `VITE_API_URL` est défini (sinon le front appelle `http://localhost:8000/api`).
-4. Le dernier déploiement est bien marqué *Ready* (et non *Error*) et promu en production.
+1. Le *Root Directory* du projet Vercel est bien la racine du dépôt.
+2. Le dernier déploiement est marqué *Ready* (et non *Error*) et promu en production.
+3. `VITE_API_URL` est défini sur le projet.
 
 ---
 
