@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SignalementPublicController;
+use App\Http\Controllers\AdminPreuveController;
 use App\Http\Controllers\AdminSignalementController;
 use App\Http\Controllers\AdminStatController;
 use App\Http\Controllers\AdminAgentController;
@@ -26,6 +27,10 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::get('/signalements', [AdminSignalementController::class, 'index']);
     Route::get('/signalements/{id}', [AdminSignalementController::class, 'show']);
     Route::patch('/signalements/{id}', [AdminSignalementController::class, 'update']);
+    // scopeBindings : une preuve d'un autre dossier renvoie 404, la protection
+    // ne repose pas sur le seul identifiant de la preuve.
+    Route::get('/signalements/{signalement}/preuves/{preuve}', [AdminPreuveController::class, 'show'])
+        ->scopeBindings();
     Route::get('/stats', [AdminStatController::class, 'admin']);
     Route::get('/agents', [AdminAgentController::class, 'index']);
 });
