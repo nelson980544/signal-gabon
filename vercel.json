@@ -1,0 +1,9 @@
+{
+  "installCommand": "npm install --prefix citizen-app",
+  "buildCommand": "npm run build --prefix citizen-app",
+  "outputDirectory": "citizen-app/dist",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

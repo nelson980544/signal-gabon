@@ -134,6 +134,35 @@ npm run dev                   # http://localhost:5174
 
 ---
 
+## Déploiement (Vercel)
+
+Ce dépôt est un monorepo : il contient **trois** applications. Chacune doit avoir
+son **propre projet Vercel**, sinon Vercel ne trouve rien à servir et renvoie
+`404 NOT_FOUND`.
+
+| Projet Vercel | Root Directory | Variables d'environnement |
+|---------------|----------------|---------------------------|
+| Site citoyen | `citizen-app` (ou la racine, voir ci-dessous) | `VITE_API_URL=https://<api>/api` |
+| Interface admin | `admin-app` | `VITE_API_URL=https://<api>/api` |
+| API Laravel | `backend` | voir `backend/.env.example` |
+
+Le `vercel.json` à la racine permet au projet du site citoyen de fonctionner
+même si son *Root Directory* est laissé à la racine du dépôt : il construit
+`citizen-app` et sert `citizen-app/dist`.
+
+Chaque application front a aussi son propre `vercel.json` avec la réécriture SPA
+(`/(.*)` → `/index.html`) nécessaire au routage React Router : sans elle, toute
+URL autre que `/` renvoie un 404.
+
+### Points de contrôle en cas de 404
+
+1. Le *Root Directory* du projet Vercel pointe bien sur le dossier de l'app.
+2. La commande de build est `npm run build` et le dossier de sortie `dist`.
+3. `VITE_API_URL` est défini (sinon le front appelle `http://localhost:8000/api`).
+4. Le dernier déploiement est bien marqué *Ready* (et non *Error*) et promu en production.
+
+---
+
 ## Licence
 
 MIT — République Gabonaise / CNLCEI — 2024
