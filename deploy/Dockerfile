@@ -8,7 +8,7 @@ FROM php:8.3-fpm-alpine
 
 RUN apk add --no-cache \
         git curl zip unzip oniguruma-dev libzip-dev libpng-dev libjpeg-turbo-dev \
-        freetype-dev icu-dev mariadb-client gnupg \
+        freetype-dev icu-dev mariadb-client gnupg exiftool qpdf \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" pdo pdo_mysql mbstring zip bcmath gd exif opcache
 

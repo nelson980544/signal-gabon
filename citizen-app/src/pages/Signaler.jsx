@@ -266,8 +266,12 @@ export default function Signaler() {
             </div>
 
             <div className="bg-vert/10 border border-vert/30 rounded-xl p-4">
-              <p className="text-sm text-vert font-medium">🔒 Anonymat total garanti — Aucune donnée personnelle collectée</p>
-              <p className="text-xs text-vert/70 mt-1">Votre identité ne peut pas être retracée à partir de ce signalement.</p>
+              <p className="text-sm text-vert font-medium">🔒 Ni votre identité, ni votre adresse IP ne sont enregistrées</p>
+              <p className="text-xs text-vert/70 mt-1">
+                Les métadonnées de vos fichiers sont supprimées. Relisez votre description : ce que
+                vous y écrivez peut, lui, vous désigner.{' '}
+                <Link to="/protection" className="underline font-medium">En savoir plus</Link>
+              </p>
             </div>
 
             <label className="flex items-start gap-3 cursor-pointer bg-white border rounded-xl p-4">
@@ -278,7 +282,11 @@ export default function Signaler() {
                 className="mt-0.5 w-5 h-5 accent-vert flex-shrink-0"
               />
               <span className="text-sm text-gray-700">
-                Je certifie que les faits rapportés sont réels à ma connaissance et que ce signalement est fait de bonne foi.
+                Je certifie que les faits rapportés sont réels à ma connaissance et que ce
+                signalement est fait de bonne foi. J'ai pris connaissance des{' '}
+                <Link to="/conditions" className="text-bleu underline">conditions d'utilisation</Link>{' '}
+                et de la{' '}
+                <Link to="/confidentialite" className="text-bleu underline">politique de confidentialité</Link>.
               </span>
             </label>
 

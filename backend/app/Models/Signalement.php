@@ -14,6 +14,11 @@ class Signalement extends Model
         'province', 'ville', 'statut', 'agent_id', 'message_agent', 'email_contact',
     ];
 
+    // L'email de contact est la seule donnée nominative du dossier. Chiffré,
+    // il reste illisible pour quiconque obtiendrait une copie de la base ou
+    // d'une sauvegarde sans la clé APP_KEY.
+    protected $casts = ['email_contact' => 'encrypted'];
+
     public function agent()
     {
         return $this->belongsTo(User::class, 'agent_id');
