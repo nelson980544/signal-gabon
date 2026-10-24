@@ -92,7 +92,7 @@ export function AuthProvider({ children }) {
       setToken(data.token)
       setExpiresAt(expiry)
       setShowWarning(false)
-      // Mettre à jour le localStorage avec le nouveau token
+      // Mettre à jour le sessionStorage avec le nouveau token
       const session = loadSession()
       if (session) saveSession(data.token, session.user, expiry)
       scheduleTimers(expiry)

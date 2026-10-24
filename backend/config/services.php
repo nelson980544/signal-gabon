@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+
+    'preuves' => [
+        // true : refuser un fichier dont les métadonnées n'ont pas pu être supprimées
+        'strict_sanitize' => (bool) env('PREUVES_STRICT_SANITIZE', false),
+    ],
+
 ];

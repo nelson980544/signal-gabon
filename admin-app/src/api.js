@@ -3,13 +3,14 @@ import axios from 'axios'
 const STORAGE_KEY = 'sg_session'
 
 // ── Persistance ────────────────────────────────────────────────────────────
+// sessionStorage : le token disparaît à la fermeture de l'onglet et n'est pas partagé entre onglets.
 export function saveSession(token, user, expiresAt) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ token, user, expiresAt }))
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ token, user, expiresAt }))
 }
 
 export function loadSession() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = sessionStorage.getItem(STORAGE_KEY)
     if (!raw) return null
     const session = JSON.parse(raw)
     // Session expirée côté client → on la supprime
@@ -24,7 +25,7 @@ export function loadSession() {
 }
 
 export function clearSession() {
-  localStorage.removeItem(STORAGE_KEY)
+  sessionStorage.removeItem(STORAGE_KEY)
 }
 
 // ── Token en mémoire (performance) ────────────────────────────────────────

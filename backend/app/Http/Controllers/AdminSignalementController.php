@@ -6,6 +6,7 @@ use App\Models\Signalement;
 use App\Models\SignalementHistorique;
 use App\Notifications\StatutSignalementChange;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 
@@ -35,6 +36,17 @@ class AdminSignalementController extends Controller
         $s = Signalement::with(['agent', 'preuves', 'historiques.agent'])->findOrFail($id);
 
         $this->authorize('view', $s);
+
+        // Traçabilité : qui a consulté quel signalement
+        try {
+            DB::table('signalement_consultations')->insert([
+                'signalement_id' => $s->id,
+                'user_id'        => $request->user()->id,
+                'created_at'     => now(),
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Journal de consultation indisponible : ' . $e->getMessage());
+        }
 
         return response()->json($s);
     }

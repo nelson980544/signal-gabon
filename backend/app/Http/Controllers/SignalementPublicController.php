@@ -6,6 +6,7 @@ use App\Models\Preuve;
 use App\Models\Signalement;
 use App\Services\ImageSanitizer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SignalementPublicController extends Controller
 {
@@ -52,15 +53,22 @@ class SignalementPublicController extends Controller
         $signalementData['code'] = $this->generateCode();
         $signalementData['statut'] = 'recu';
 
+        // Nettoyer toutes les preuves AVANT de créer le signalement : un fichier refusé
+        // ne laisse pas de signalement orphelin.
+        foreach ($fileData as $file) {
+            if (!ImageSanitizer::strip($file->getRealPath())) {
+                return response()->json(['message' => 'Fichier de preuve non conforme ou illisible'], 422);
+            }
+        }
+
         $s = Signalement::create($signalementData);
 
-        // Supprimer les EXIF et stocker via le disk configuré (local ou S3/R2)
-        foreach ($fileData as $file) {
-            ImageSanitizer::strip($file->getRealPath());
+        // Stocker via le disk configuré (local ou S3/R2)
+        foreach ($fileData as $i => $file) {
             $path = $file->store("preuves/{$s->code}");
             Preuve::create([
                 'signalement_id' => $s->id,
-                'nom_fichier'    => $file->getClientOriginalName(),
+                'nom_fichier'    => ImageSanitizer::safeName($file, $i),
                 'chemin'         => $path,
                 'type_fichier'   => $file->getMimeType(),
                 'taille'         => $file->getSize(),
@@ -74,9 +82,22 @@ class SignalementPublicController extends Controller
         ], 201);
     }
 
-    public function statut($code)
+    /** Journalise un code inconnu (détection d'énumération) avec une empreinte d'IP non réversible. */
+    private function logCodeInconnu(Request $request, string $action): void
     {
-        $s = Signalement::where('code', $code)->firstOrFail();
+        Log::warning('Code de suivi inconnu', [
+            'action' => $action,
+            'ip'     => substr(hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')), 0, 16),
+        ]);
+    }
+
+    public function statut(Request $request, $code)
+    {
+        $s = Signalement::where('code', $code)->first();
+        if (!$s) {
+            $this->logCodeInconnu($request, 'statut');
+            abort(404);
+        }
 
         return response()->json([
             'code'          => $s->code,
@@ -90,7 +111,11 @@ class SignalementPublicController extends Controller
 
     public function storePreuves(Request $request, $code)
     {
-        $s = Signalement::where('code', $code)->firstOrFail();
+        $s = Signalement::where('code', $code)->first();
+        if (!$s) {
+            $this->logCodeInconnu($request, 'preuves');
+            abort(404);
+        }
 
         // Vérifier la limite totale (10 preuves max par signalement)
         $existantes = $s->preuves()->count();
@@ -104,13 +129,19 @@ class SignalementPublicController extends Controller
             return response()->json(['message' => 'Limite de 10 preuves atteinte pour ce signalement'], 422);
         }
 
+        $fichiers = $request->file('fichiers');
+        foreach ($fichiers as $file) {
+            if (!ImageSanitizer::strip($file->getRealPath())) {
+                return response()->json(['message' => 'Fichier de preuve non conforme ou illisible'], 422);
+            }
+        }
+
         $preuves = [];
-        foreach ($request->file('fichiers') as $file) {
-            ImageSanitizer::strip($file->getRealPath());
+        foreach ($fichiers as $i => $file) {
             $path      = $file->store("preuves/{$code}");
             $preuves[] = Preuve::create([
                 'signalement_id' => $s->id,
-                'nom_fichier'    => $file->getClientOriginalName(),
+                'nom_fichier'    => ImageSanitizer::safeName($file, $existantes + $i),
                 'chemin'         => $path,
                 'type_fichier'   => $file->getMimeType(),
                 'taille'         => $file->getSize(),

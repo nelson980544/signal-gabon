@@ -20,8 +20,13 @@ foreach ([
     }
 }
 
+// Base externe (Postgres/MySQL managé) : si DB_CONNECTION est fourni par l'environnement
+// Vercel et n'est pas sqlite, on n'utilise PAS la base SQLite éphémère de /tmp
+// (données et tokens perdus à chaque cold start).
+$externalDb = getenv('DB_CONNECTION') && getenv('DB_CONNECTION') !== 'sqlite';
+
 $dbDest = '/tmp/database.sqlite';
-if (!file_exists($dbDest)) {
+if (!$externalDb && !file_exists($dbDest)) {
     $dbSource = __DIR__ . '/../database/database.sqlite';
     if (file_exists($dbSource)) {
         copy($dbSource, $dbDest);
@@ -35,8 +40,6 @@ $_SERVER['PHP_SELF']        = '/index.php';
 
 $envVars = [
     'VERCEL_STORAGE_PATH'  => $tmpStorage,
-    'DB_CONNECTION'        => 'sqlite',
-    'DB_DATABASE'          => $dbDest,
     'SESSION_DRIVER'       => 'cookie',
     'CACHE_STORE'          => 'array',
     'LOG_CHANNEL'          => 'stderr',
@@ -49,6 +52,13 @@ $envVars = [
     'APP_ROUTES_CACHE'     => '/tmp/routes-v7.php',
     'APP_EVENTS_CACHE'     => '/tmp/events.php',
 ];
+
+if (!$externalDb) {
+    $envVars['DB_CONNECTION'] = 'sqlite';
+    $envVars['DB_DATABASE']   = $dbDest;
+    // Avertissement : SQLite dans /tmp est éphémère (réservé à la démo).
+    error_log('[SignalGabon] SQLite éphémère utilisée : configurer DB_CONNECTION/DB_* pour la production.');
+}
 
 foreach ($envVars as $key => $value) {
     $_ENV[$key] = $value;

@@ -12,8 +12,10 @@ services:
         value: production
       - key: APP_DEBUG
         value: false
+      # Format requis : "base64:..." (php artisan key:generate --show). Un generateValue
+      # Render ne donne pas ce format et provoque "Unsupported cipher or incorrect key length".
       - key: APP_KEY
-        generateValue: true
+        sync: false
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
