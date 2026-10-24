@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Pas de page de connexion côté serveur : les clients (citizen-app,
         // admin-app) gèrent eux-mêmes la redirection après un 401.
         $middleware->redirectGuestsTo(fn () => null);
+
+        $middleware->alias([
+            'actif' => \App\Http\Middleware\EnsureUserIsActive::class,
+            'superviseur' => \App\Http\Middleware\EnsureUserIsSuperviseur::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // L'API répond toujours en JSON : sans cela, une requête sans en-tête
