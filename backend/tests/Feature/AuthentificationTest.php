@@ -202,7 +202,8 @@ class AuthentificationTest extends TestCase
         $agent->update(['is_active' => false]);
 
         $this->avecToken($token)->getJson('/api/admin/signalements')->assertForbidden();
-        $this->avecToken($token)->getJson('/api/auth/me')->assertForbidden();
+        // Le token est révoqué au premier refus : il ne sert plus à rien.
+        $this->avecToken($token)->getJson('/api/auth/me')->assertUnauthorized();
     }
 
     public function test_la_reponse_de_connexion_n_expose_ni_mot_de_passe_ni_remember_token(): void

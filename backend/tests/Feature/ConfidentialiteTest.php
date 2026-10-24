@@ -84,12 +84,12 @@ class ConfidentialiteTest extends TestCase
         return $cles;
     }
 
-    private function assertReponsePublique(\Illuminate\Testing\TestResponse $reponse, string $contexte): void
+    private function assertReponsePublique(\Illuminate\Testing\TestResponse $reponse, string $contexte, bool $verifierCles = true): void
     {
         $corps = $reponse->getContent();
         $json = json_decode($corps, true);
 
-        if (is_array($json)) {
+        if ($verifierCles && is_array($json)) {
             $interdites = array_intersect(self::CLES_INTERDITES, $this->aplatirCles($json));
             $this->assertSame([], array_values($interdites), "{$contexte} : clé(s) interne(s) exposée(s).");
         }
@@ -132,7 +132,8 @@ class ConfidentialiteTest extends TestCase
         );
         $this->assertReponsePublique(
             $this->parIpDuCitoyen()->postJson('/api/signalements', [])->assertUnprocessable(),
-            'erreur de validation'
+            'erreur de validation',
+            verifierCles: false // les noms de champs y figurent par nature
         );
     }
 
