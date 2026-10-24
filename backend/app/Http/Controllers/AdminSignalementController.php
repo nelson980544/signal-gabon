@@ -7,6 +7,7 @@ use App\Models\SignalementHistorique;
 use App\Notifications\StatutSignalementChange;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\Rule;
 
 class AdminSignalementController extends Controller
 {
@@ -47,8 +48,8 @@ class AdminSignalementController extends Controller
 
         $data = $request->validate([
             'statut'        => 'sometimes|in:recu,en_examen,attribue,en_instruction,traite,classe',
-            'agent_id'      => 'sometimes|nullable|exists:users,id',
-            'message_agent' => 'sometimes|nullable|string',
+            'agent_id'      => ['sometimes', 'nullable', Rule::exists('users', 'id')->where('role', 'agent')->where('is_active', true)],
+            'message_agent' => 'sometimes|nullable|string|max:2000',
         ]);
 
         if ($user->role === 'agent') {

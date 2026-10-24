@@ -36,8 +36,8 @@ class SignalementPublicController extends Controller
     {
         $validated = $request->validate([
             'categorie'     => 'required|in:Administration publique,Police et gendarmerie,Santé et hôpitaux,Éducation et universités,Douanes et frontières,Justice et tribunaux,Marchés publics,Autre',
-            'description'   => 'required|string|min:50',
-            'date_faits'    => 'required|date',
+            'description'   => 'required|string|min:50|max:10000',
+            'date_faits'    => 'required|date|before_or_equal:today',
             'province'      => 'required|in:Estuaire,Haut-Ogooué,Moyen-Ogooué,Ngounié,Nyanga,Ogooué-Ivindo,Ogooué-Lolo,Ogooué-Maritime,Woleu-Ntem',
             'ville'         => 'required|string|max:100',
             'email_contact' => 'sometimes|nullable|email|max:255',

@@ -13,7 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies(at: '*');
+        // Restreindre via TRUSTED_PROXIES (IP/CIDR séparés par des virgules) quand
+        // l'IP du proxy de la plateforme est connue ; '*' par défaut pour ne pas
+        // casser les déploiements existants.
+        $trusted = env('TRUSTED_PROXIES', '*');
+        $middleware->trustProxies(at: $trusted === '*' ? '*' : array_map('trim', explode(',', $trusted)));
+
+        $middleware->alias([
+            'active'      => \App\Http\Middleware\EnsureUserIsActive::class,
+            'superviseur' => \App\Http\Middleware\EnsureUserIsSuperviseur::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

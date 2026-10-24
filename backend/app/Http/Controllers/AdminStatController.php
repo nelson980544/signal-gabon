@@ -58,13 +58,17 @@ class AdminStatController extends Controller
     {
         $stats = $this->publiques()->getData(true);
 
-        $nonAttribues = Signalement::whereNull('agent_id')->count();
+        $stats['non_attribues'] = Signalement::whereNull('agent_id')->count();
+
+        if ($request->user()->role !== 'superviseur') {
+            return response()->json($stats);
+        }
+
         $parAgent = User::where('role', 'agent')
             ->withCount('signalements')
             ->get()
             ->map(fn($u) => ['agent' => $u->name, 'total' => $u->signalements_count]);
 
-        $stats['non_attribues'] = $nonAttribues;
         $stats['par_agent']     = $parAgent;
 
         return response()->json($stats);

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 // Auth
 Route::middleware('throttle:5,1')->post('/auth/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
     Route::get('/auth/me', [AuthController::class, 'me']);
@@ -22,10 +22,10 @@ Route::middleware('throttle:10,1')->post('/signalements/{code}/preuves', [Signal
 Route::get('/stats/publiques', [AdminStatController::class, 'publiques']);
 
 // Admin (auth)
-Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'active'])->prefix('admin')->group(function () {
     Route::get('/signalements', [AdminSignalementController::class, 'index']);
     Route::get('/signalements/{id}', [AdminSignalementController::class, 'show']);
     Route::patch('/signalements/{id}', [AdminSignalementController::class, 'update']);
     Route::get('/stats', [AdminStatController::class, 'admin']);
-    Route::get('/agents', [AdminAgentController::class, 'index']);
+    Route::get('/agents', [AdminAgentController::class, 'index'])->middleware('superviseur');
 });
