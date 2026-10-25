@@ -95,7 +95,7 @@ footer b{color:#fff}
   <div class="card kpi"><b>8</b><span>catégories dont « Justice et tribunaux »</span></div>
   <div class="card kpi"><b>9</b><span>provinces du Gabon couvertes</span></div>
  </div>
- <div class="note ok"><b>Ce que le Ministère peut retenir :</b> la plateforme existe et fonctionne (signalement, suivi, traitement, statistiques, traçabilité). Elle est prête à être éprouvée dans un cadre pilote, sous réserve de la mise en place du cadre juridique et de l'hébergement souverain décrits plus loin.</div>
+ <div class="note ok"><b>Ce que le Ministère peut retenir :</b> la plateforme existe et fonctionne (signalement, suivi, traitement, statistiques, traçabilité). Elle est prête à être éprouvée dans un cadre pilote, sous réserve de la mise en place du cadre juridique et de la migration vers le data center de ST Digital à Nkok, décrits plus loin.</div>
 </div></section>
 
 <section id="enjeu"><div class="wrap">
@@ -198,6 +198,7 @@ footer b{color:#fff}
   <div class="card"><h4>🔒 Anonymat par conception</h4><ul><li>Aucun nom, téléphone ni e-mail n'est collecté par le formulaire citoyen.</li><li>Code de suivi aléatoire généré par un générateur cryptographique.</li><li>Pas de compte citoyen, pas de mot de passe à retenir.</li></ul></div>
   <div class="card"><h4>🖼️ Protection des preuves</h4><ul><li>Suppression automatique des métadonnées (EXIF : GPS, appareil) des photos JPEG et PNG.</li><li>Types et tailles de fichiers contrôlés.</li><li>Stockage possible sur un espace cloud privé (compatible S3).</li></ul></div>
   <div class="card"><h4>🔑 Accès à l'espace agents</h4><ul><li>Connexion par identifiant et mot de passe, limitée à 5 tentatives par minute.</li><li>Session de 6 heures, avertissement avant expiration, déconnexion possible.</li><li>Droits vérifiés côté serveur (agent / superviseur).</li></ul></div>
+  <div class="card"><h4>🇬🇦 Données hébergées au Gabon</h4><ul><li>Hébergement dans le data center de ST Digital à Nkok.</li><li>Les données restent sur le territoire national, sous maîtrise de l'État.</li></ul></div>
   <div class="card"><h4>🧾 Traçabilité et robustesse</h4><ul><li>Historique d'audit de toutes les actions sur un dossier.</li><li>Limitation du nombre de requêtes sur les points publics (anti-abus).</li><li>Valeurs contrôlées (catégories, provinces, statuts) en base de données.</li></ul></div>
  </div>
  <div class="note warn"><b>Point d'attention honnête :</b> le texte « anonymat garanti à 100 % » présent dans l'interface devra être nuancé avant tout lancement public. L'application ne stocke aucune identité, mais l'anonymat réel dépend aussi de l'hébergement, des journaux des serveurs et du comportement de l'utilisateur (voir section 9).</div>
@@ -212,7 +213,7 @@ footer b{color:#fff}
  </div>
  <ul>
   <li><b>Base de données :</b> SQLite (démonstration), PostgreSQL ou MySQL (production).</li>
-  <li><b>Hébergement :</b> déjà préparé pour Vercel, Render et Railway ; une installation sur un hébergement souverain gabonais est possible.</li>
+  <li><b>Hébergement :</b> les données seront hébergées au Gabon, dans le <b>data center de ST Digital à Nkok</b>. Les hébergements Vercel, Render et Railway ne servent qu'à la démonstration.</li>
   <li><b>Code source ouvert au Ministère</b> : l'État peut l'auditer, l'héberger et le faire évoluer librement.</li>
  </ul>
 </div></section>
@@ -240,7 +241,7 @@ footer b{color:#fff}
   <tr><td>Cadre juridique</td><td><span class="tag t-no">À faire</span></td><td>Pas de politique de confidentialité, de conditions d'utilisation ni de dispositif de protection des lanceurs d'alerte rattachés à la plateforme.</td></tr>
   <tr><td>Intégration Justice</td><td><span class="tag t-no">À faire</span></td><td>Rôle Ministère / parquets non développé.</td></tr>
   <tr><td>Tests et audit de sécurité</td><td><span class="tag t-no">À faire</span></td><td>Pas de batterie de tests automatisés ; audit externe recommandé avant mise en production.</td></tr>
-  <tr><td>Hébergement</td><td><span class="tag t-pa">À décider</span></td><td>Hébergements de démonstration ; hébergement souverain à définir.</td></tr>
+  <tr><td>Hébergement</td><td><span class="tag t-ok">Décidé</span></td><td>Data center de ST Digital à Nkok ; migration depuis les hébergements de démonstration à planifier.</td></tr>
   <tr><td>Données affichées</td><td><span class="tag t-pa">Démo</span></td><td>15 signalements fictifs et comptes de démonstration. Aucune donnée réelle.</td></tr>
  </table>
 </div></section>
@@ -248,7 +249,7 @@ footer b{color:#fff}
 <section id="suite"><div class="wrap">
  <h2><span class="num">10</span>Feuille de route et demandes</h2>
  <div class="grid g3">
-  <div class="card"><h4>Phase 1 — Cadrage (1 à 2 mois)</h4><ul><li>Cadre juridique et protocole avec la CNLCEI</li><li>Choix de l'hébergement souverain</li><li>Audit de sécurité</li></ul></div>
+  <div class="card"><h4>Phase 1 — Cadrage (1 à 2 mois)</h4><ul><li>Cadre juridique et protocole avec la CNLCEI</li><li>Migration vers le data center de ST Digital à Nkok</li><li>Audit de sécurité</li></ul></div>
   <div class="card"><h4>Phase 2 — Pilote (3 mois)</h4><ul><li>Déploiement sur 1 à 2 provinces</li><li>Module de transmission aux parquets</li><li>Formation des agents</li></ul></div>
   <div class="card"><h4>Phase 3 — Généralisation</h4><ul><li>Couverture nationale</li><li>Campagne de communication</li><li>Évaluation publique des résultats</li></ul></div>
  </div>
