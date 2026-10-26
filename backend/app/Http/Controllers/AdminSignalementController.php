@@ -6,7 +6,10 @@ use App\Models\Signalement;
 use App\Models\SignalementHistorique;
 use App\Notifications\StatutSignalementChange;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 
 class AdminSignalementController extends Controller
 {
@@ -55,29 +58,59 @@ class AdminSignalementController extends Controller
             unset($data['agent_id']);
         }
 
+        if (isset($data['statut']) && ! $s->peutPasserA($data['statut'], $user)) {
+            throw ValidationException::withMessages([
+                'statut' => "Le passage de « {$s->statut} » à « {$data['statut']} » n'est pas autorisé.",
+            ]);
+        }
+
         $ancienStatut  = $s->statut;
         $ancienAgentId = $s->agent_id;
 
-        $s->update($data);
+        // Un formulaire envoie l'identifiant en texte, la base le stocke en
+        // entier : sans conversion, ré-envoyer le même agent créait une ligne
+        // d'historique à chaque sauvegarde.
+        $nouvelAgentId = array_key_exists('agent_id', $data) && $data['agent_id'] !== null
+            ? (int) $data['agent_id']
+            : null;
+        if ($nouvelAgentId !== null) {
+            $data['agent_id'] = $nouvelAgentId;
+        }
 
         $statutChange = isset($data['statut']) && $data['statut'] !== $ancienStatut;
-        $agentChange  = array_key_exists('agent_id', $data) && $data['agent_id'] !== $ancienAgentId;
+        $agentChange  = array_key_exists('agent_id', $data) && $nouvelAgentId !== $ancienAgentId;
 
-        if ($statutChange || $agentChange) {
-            SignalementHistorique::create([
-                'signalement_id'   => $s->id,
-                'agent_id'         => $user->id,
-                'ancien_statut'    => $statutChange ? $ancienStatut : null,
-                'nouveau_statut'   => $statutChange ? $s->statut : null,
-                'ancien_agent_id'  => $agentChange ? $ancienAgentId : null,
-                'nouveau_agent_id' => $agentChange ? $s->agent_id : null,
-                'commentaire'      => $data['message_agent'] ?? null,
-            ]);
+        // Le dossier et sa trace changent ensemble ou pas du tout.
+        DB::transaction(function () use ($s, $data, $user, $ancienStatut, $ancienAgentId, $statutChange, $agentChange) {
+            $s->update($data);
 
-            // Notifier le citoyen par email si un email de contact a été fourni
-            if ($statutChange && $s->email_contact) {
+            if ($statutChange || $agentChange) {
+                SignalementHistorique::create([
+                    'signalement_id'   => $s->id,
+                    'agent_id'         => $user->id,
+                    'ancien_statut'    => $statutChange ? $ancienStatut : null,
+                    'nouveau_statut'   => $statutChange ? $s->statut : null,
+                    'ancien_agent_id'  => $agentChange ? $ancienAgentId : null,
+                    'nouveau_agent_id' => $agentChange ? $s->agent_id : null,
+                    'commentaire'      => $data['message_agent'] ?? null,
+                ]);
+            }
+        });
+
+        // Notifier le citoyen par email si un email de contact a été fourni.
+        if ($statutChange && $s->email_contact) {
+            try {
                 Notification::route('mail', $s->email_contact)
                     ->notify(new StatutSignalementChange($s, $ancienStatut));
+            } catch (\Throwable $e) {
+                // Le statut est déjà enregistré : une panne SMTP ne doit pas
+                // faire croire à l'agent que rien n'a été fait. Ni le message
+                // de l'exception (il cite l'adresse du citoyen) ni l'adresse
+                // elle-même ne vont au journal.
+                Log::warning('Notification de changement de statut non envoyée', [
+                    'signalement_id' => $s->id,
+                    'erreur'         => $e::class,
+                ]);
             }
         }
 

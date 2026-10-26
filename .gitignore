@@ -21,6 +21,11 @@
 /admin-app/.env
 /admin-app/.env.local
 
+# Site unifié (build racine)
+/dist/
+/node_modules/
+/.vercel/
+
 # General
 .DS_Store
 Thumbs.db

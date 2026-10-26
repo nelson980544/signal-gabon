@@ -49,15 +49,38 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       clearToken()
       clearSession()
-      // Sauvegarder l'URL courante pour y revenir après reconnexion
-      const current = window.location.pathname + window.location.search
+      // BASE_URL vaut '/' en local et '/admin/' quand l'app est servie
+      // sous un sous-chemin du déploiement unifié.
+      const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+      // Sauvegarder l'URL courante (sans le base path) pour y revenir
+      // après reconnexion — le routeur l'interprète relativement au basename.
+      const current =
+        window.location.pathname.slice(base.length) + window.location.search
       if (current !== '/login') {
         sessionStorage.setItem('sg_redirect_after_login', current)
       }
-      window.location.href = '/login'
+      window.location.href = `${base}/login`
     }
     return Promise.reject(err)
   }
 )
+
+// ── Preuves ────────────────────────────────────────────────────────────────
+/**
+ * Récupère une preuve et renvoie une URL d'objet exploitable par <img>,
+ * <iframe>, <audio> ou un lien de téléchargement.
+ *
+ * Un <a href> ne peut pas porter le jeton Sanctum : le fichier passe donc par
+ * l'instance axios, qui ajoute l'en-tête et gère déjà l'expiration de session.
+ *
+ * L'appelant DOIT libérer l'URL avec URL.revokeObjectURL quand il a fini,
+ * sinon le fichier reste en mémoire jusqu'au rechargement de la page.
+ */
+export async function recupererPreuve(signalementId, preuveId) {
+  const r = await api.get(`/admin/signalements/${signalementId}/preuves/${preuveId}`, {
+    responseType: 'blob'
+  })
+  return { url: URL.createObjectURL(r.data), type: r.data.type }
+}
 
 export default api

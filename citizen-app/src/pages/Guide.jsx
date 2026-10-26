@@ -73,7 +73,7 @@ export default function Guide() {
         <div className="max-w-5xl mx-auto">
           <div className="text-4xl mb-3">📖</div>
           <h1 className="text-3xl font-bold mb-2">Guide Utilisateur</h1>
-          <p className="text-blue-200 text-sm">Comment utiliser la plateforme SignalGabon — Aucune inscription requise · Anonymat total garanti</p>
+          <p className="text-blue-200 text-sm">Comment utiliser la plateforme SignalGabon — Aucune inscription requise · Ni identité ni adresse IP enregistrées</p>
         </div>
       </div>
 
@@ -130,14 +130,17 @@ export default function Guide() {
               </p>
               <p className="text-gray-700 leading-relaxed mb-4"><strong>Ce que vous pouvez faire sur SignalGabon :</strong></p>
               <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex gap-2"><span className="text-vert">✓</span> Soumettre un signalement de corruption de façon totalement anonyme</li>
+                <li className="flex gap-2"><span className="text-vert">✓</span> Soumettre un signalement de corruption sans donner votre identité</li>
                 <li className="flex gap-2"><span className="text-vert">✓</span> Joindre des preuves (photos, documents, enregistrements audio)</li>
                 <li className="flex gap-2"><span className="text-vert">✓</span> Suivre l'état de votre dossier grâce à un code unique</li>
                 <li className="flex gap-2"><span className="text-vert">✓</span> Consulter les statistiques publiques de lutte contre la corruption</li>
               </ul>
             </div>
             <InfoBox type="info">
-              Votre anonymat est garanti à 100% — Aucune donnée personnelle n'est collectée. Votre identité ne peut pas être retracée à partir de votre signalement.
+              La plateforme n'enregistre ni votre identité, ni votre adresse IP, et supprime les
+              métadonnées de vos fichiers. Aucune plateforme ne peut garantir un anonymat absolu :
+              la page <Link to="/protection" className="font-semibold underline">protection des lanceurs d'alerte</Link>{' '}
+              dit précisément ce qui peut malgré tout vous identifier et comment l'éviter.
             </InfoBox>
           </section>
 
@@ -304,7 +307,10 @@ export default function Guide() {
                 </div>
                 <p className="text-xs text-gray-500 mb-4">Maximum 5 fichiers · 10 MB par fichier</p>
                 <InfoBox type="info">
-                  Veillez à ce que vos fichiers ne contiennent pas de métadonnées permettant de vous identifier si vous souhaitez rester totalement anonyme.
+                  Les métadonnées de vos fichiers (coordonnées GPS d'une photo, auteur d'un document)
+                  sont supprimées avant stockage, et leur nom d'origine n'est pas conservé. Vérifiez
+                  en revanche ce que vos pièces <strong>montrent</strong> : un bureau, un badge ou une
+                  écriture peuvent vous désigner.
                 </InfoBox>
                 <p className="text-sm text-gray-600">Si vous n'avez pas de preuves, cliquez sur <strong>Passer cette étape →</strong>.</p>
               </div>
@@ -349,7 +355,7 @@ export default function Guide() {
                 <p className="text-xs text-gray-500 mt-2">Format de votre code de suivi</p>
               </div>
               <InfoBox type="danger">
-                Notez précieusement ce code. C'est le seul moyen de consulter l'état de votre dossier. Sans ce code, il n'est pas possible de retrouver votre signalement (garantie d'anonymat). Il ne peut pas être récupéré en cas de perte.
+                Notez précieusement ce code. C'est le seul moyen de consulter l'état de votre dossier, et il ne peut pas être récupéré en cas de perte. Conservez-le ailleurs que sur un appareil professionnel : toute personne qui l'obtient peut consulter l'état du dossier.
               </InfoBox>
             </div>
           </Section>
@@ -444,7 +450,7 @@ export default function Guide() {
               {[
                 {
                   q: 'Puis-je signaler anonymement ?',
-                  a: 'Oui. La plateforme ne collecte aucune donnée personnelle. Votre identité ne peut pas être retracée.',
+                  a: 'Oui : aucun compte n\'est demandé, aucune adresse IP n\'est enregistrée et les métadonnées de vos fichiers sont supprimées. Attention toutefois à ce que vous écrivez : une description que vous seul pouviez connaître peut vous désigner. La page « protection des lanceurs d\'alerte » détaille les précautions à prendre.',
                 },
                 {
                   q: 'Mon signalement sera-t-il traité ?',
@@ -456,11 +462,11 @@ export default function Guide() {
                 },
                 {
                   q: 'Que faire si j\'ai perdu mon code de suivi ?',
-                  a: 'Le code ne peut pas être récupéré — c\'est la contrepartie de l\'anonymat total. Vous pouvez soumettre un nouveau signalement si nécessaire.',
+                  a: 'Le code ne peut pas être récupéré : comme nous n\'enregistrons pas votre identité, rien ne nous permet de relier un dossier à vous. Le signalement poursuit son instruction, mais vous ne pourrez plus en suivre l\'état. Vous pouvez soumettre un nouveau signalement si nécessaire.',
                 },
                 {
                   q: 'La plateforme est-elle sécurisée ?',
-                  a: 'Oui. La plateforme est opérée par la CNLCEI, institution officielle de la République Gabonaise.',
+                  a: 'La plateforme est opérée par la CNLCEI et hébergée au Gabon. Les échanges sont chiffrés, aucune adresse IP n\'est enregistrée et les métadonnées des fichiers sont supprimées. Ses limites sont décrites sans détour sur la page « protection des lanceurs d\'alerte ».',
                 },
               ].map(({ q, a }) => (
                 <details key={q} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
@@ -504,10 +510,13 @@ export default function Guide() {
             <p className="font-bold text-jaune mb-1">🛡️ SignalGabon</p>
             <p className="text-xs text-white/60">Plateforme officielle de la CNLCEI — République Gabonaise</p>
           </div>
-          <div className="flex gap-6 text-sm text-white/70">
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/70">
             <Link to="/signaler" className="hover:text-white">Signaler</Link>
             <Link to="/suivi" className="hover:text-white">Suivre mon dossier</Link>
             <Link to="/stats" className="hover:text-white">Statistiques</Link>
+            <Link to="/protection" className="hover:text-white">Protection des lanceurs d'alerte</Link>
+            <Link to="/confidentialite" className="hover:text-white">Confidentialité</Link>
+            <Link to="/conditions" className="hover:text-white">Conditions</Link>
           </div>
         </div>
         <div className="max-w-5xl mx-auto mt-6 border-t border-white/20 pt-4 text-center text-xs text-white/40">

@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../AuthContext'
-import api from '../api'
+import api, { recupererPreuve } from '../api'
+import Tooltip from '../components/Tooltip'
+import VisionneusePreuve from '../components/VisionneusePreuve'
+
+// Un fichier de quelques centaines d'octets ne doit pas s'afficher « 0 Ko ».
+function formaterTaille(octets) {
+  if (octets < 1024) return `${octets} o`
+  if (octets < 1024 * 1024) return `${(octets / 1024).toFixed(0)} Ko`
+  return `${(octets / (1024 * 1024)).toFixed(1)} Mo`
+}
 
 const STATUTS = ['recu', 'en_examen', 'attribue', 'en_instruction', 'traite', 'classe']
 const STATUT_LABELS = {
@@ -31,6 +40,10 @@ export default function SignalementDetail() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [erreur, setErreur] = useState('')
+  // Preuve ouverte dans la visionneuse : { preuve, url, type }
+  const [apercu, setApercu] = useState(null)
+  const [preuveEnCours, setPreuveEnCours] = useState(null)
+  const [erreurPreuve, setErreurPreuve] = useState({})
 
   useEffect(() => {
     api.get(`/admin/signalements/${id}`).then(r => {
@@ -59,6 +72,50 @@ export default function SignalementDetail() {
     } catch (e) {
       setErreur(e.response?.data?.message || 'Erreur lors de la sauvegarde')
     } finally { setSaving(false) }
+  }
+
+  const messageErreurPreuve = e =>
+    e.response?.status === 404
+      ? 'Fichier introuvable sur le serveur'
+      : e.response?.status === 403
+        ? 'Accès refusé à cette pièce'
+        : 'Impossible de récupérer cette pièce'
+
+  const consulter = async preuve => {
+    setPreuveEnCours(preuve.id)
+    setErreurPreuve(prev => ({ ...prev, [preuve.id]: null }))
+    try {
+      const { url, type } = await recupererPreuve(id, preuve.id)
+      setApercu({ preuve, url, type })
+    } catch (e) {
+      setErreurPreuve(prev => ({ ...prev, [preuve.id]: messageErreurPreuve(e) }))
+    } finally {
+      setPreuveEnCours(null)
+    }
+  }
+
+  const telecharger = async preuve => {
+    setPreuveEnCours(preuve.id)
+    setErreurPreuve(prev => ({ ...prev, [preuve.id]: null }))
+    let url
+    try {
+      ;({ url } = await recupererPreuve(id, preuve.id))
+      const lien = document.createElement('a')
+      lien.href = url
+      lien.download = preuve.nom_fichier
+      lien.click()
+    } catch (e) {
+      setErreurPreuve(prev => ({ ...prev, [preuve.id]: messageErreurPreuve(e) }))
+    } finally {
+      // Laisser au navigateur le temps de démarrer le téléchargement.
+      if (url) setTimeout(() => URL.revokeObjectURL(url), 10000)
+      setPreuveEnCours(null)
+    }
+  }
+
+  const fermerApercu = () => {
+    if (apercu) URL.revokeObjectURL(apercu.url)
+    setApercu(null)
   }
 
   if (!s) return (
@@ -116,10 +173,39 @@ export default function SignalementDetail() {
               <div className="text-gray-500 text-sm mb-2">Preuves jointes ({s.preuves.length})</div>
               <div className="space-y-2">
                 {s.preuves.map(p => (
-                  <div key={p.id} className="flex items-center gap-2 text-xs bg-blue-50 border border-blue-100 rounded-lg p-2.5">
-                    <span>📄</span>
-                    <span className="text-blue-700 font-medium truncate">{p.nom_fichier}</span>
-                    <span className="text-gray-400 flex-shrink-0">({(p.taille / 1024).toFixed(0)} Ko)</span>
+                  <div key={p.id} className="bg-blue-50 border border-blue-100 rounded-lg p-2.5">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span>📄</span>
+                      <span className="text-blue-700 font-medium truncate">{p.nom_fichier}</span>
+                      <span className="text-gray-400 flex-shrink-0">({formaterTaille(p.taille)})</span>
+                      <span className="flex-1" />
+                      {preuveEnCours === p.id ? (
+                        <span className="text-gray-500 flex-shrink-0">Chargement…</span>
+                      ) : (
+                        <>
+                          <Tooltip texte="Afficher la pièce sans la télécharger">
+                            <button
+                              onClick={() => consulter(p)}
+                              className="font-medium text-blue-700 hover:text-blue-900 px-2 py-1 rounded hover:bg-blue-100"
+                            >
+                              Consulter
+                            </button>
+                          </Tooltip>
+                          <Tooltip texte="Enregistrer la pièce sur votre poste">
+                            <button
+                              onClick={() => telecharger(p)}
+                              aria-label={`Télécharger ${p.nom_fichier}`}
+                              className="font-medium text-blue-700 hover:text-blue-900 px-2 py-1 rounded hover:bg-blue-100"
+                            >
+                              ⬇
+                            </button>
+                          </Tooltip>
+                        </>
+                      )}
+                    </div>
+                    {erreurPreuve[p.id] && (
+                      <p className="text-red-600 text-xs mt-1.5">{erreurPreuve[p.id]}</p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -188,6 +274,15 @@ export default function SignalementDetail() {
           </button>
         </div>
       </div>
+
+      {apercu && (
+        <VisionneusePreuve
+          preuve={apercu.preuve}
+          url={apercu.url}
+          type={apercu.type}
+          onFermer={fermerApercu}
+        />
+      )}
     </div>
   )
 }

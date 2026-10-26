@@ -46,8 +46,10 @@ export default function Accueil() {
           </Link>
         </div>
         <div className="mt-8 bg-white/10 rounded-xl p-4 text-center max-w-sm w-full">
-          <p className="text-white text-sm">🔒 <strong>Votre anonymat est garanti à 100%</strong></p>
-          <p className="text-white/70 text-xs mt-1">Aucune donnée personnelle collectée</p>
+          <p className="text-white text-sm">🔒 <strong>Ni votre identité, ni votre adresse IP ne sont enregistrées</strong></p>
+          <Link to="/protection" className="text-white/70 text-xs mt-1 underline block">
+            Ce qui peut malgré tout vous identifier
+          </Link>
         </div>
       </div>
 
@@ -80,7 +82,7 @@ export default function Accueil() {
             <div className="grid grid-cols-3 gap-8">
               {[
                 { icon: '📝', titre: 'Décrivez les faits', desc: 'Remplissez le formulaire en détaillant les faits de corruption observés. Restez factuel.' },
-                { icon: '🔒', titre: 'Soumettez anonymement', desc: 'Aucune donnée personnelle n\'est collectée. Votre identité reste totalement protégée.' },
+                { icon: '🔒', titre: 'Soumettez sans vous identifier', desc: 'Aucun compte, aucune adresse IP enregistrée, métadonnées de vos fichiers supprimées.' },
                 { icon: '📊', titre: 'Nous agissons', desc: 'La CNLCEI examine votre signalement et prend les mesures nécessaires pour y donner suite.' }
               ].map((e, i) => (
                 <div key={i} className="text-center p-6 rounded-xl border border-gray-100 shadow-sm">
@@ -119,8 +121,13 @@ export default function Accueil() {
         {/* Bannière sécurité */}
         <section className="py-8 px-8 bg-vert">
           <div className="max-w-4xl mx-auto text-center text-white">
-            <p className="text-xl font-bold">🔒 Votre anonymat est garanti à 100%</p>
-            <p className="text-white/80 mt-1">Aucune donnée personnelle n'est collectée côté citoyen. Votre identité ne peut pas être retracée.</p>
+            <p className="text-xl font-bold">🔒 La plateforme n'enregistre ni votre identité, ni votre adresse IP</p>
+            <p className="text-white/80 mt-1">
+              Les métadonnées de vos fichiers sont supprimées et leur nom d'origine n'est pas conservé.
+            </p>
+            <Link to="/protection" className="inline-block mt-3 text-white underline font-medium">
+              Ce qui peut malgré tout vous identifier, et comment l'éviter
+            </Link>
           </div>
         </section>
 
@@ -142,8 +149,12 @@ export default function Accueil() {
                 </div>
               </div>
               <div>
-                <h3 className="font-bold text-jaune mb-3">CNLCEI</h3>
-                <p className="text-sm text-white/70">Commission Nationale de Lutte Contre la Corruption et les Infractions Économiques — République Gabonaise</p>
+                <h3 className="font-bold text-jaune mb-3">Informations légales</h3>
+                <div className="space-y-1 text-sm text-white/70">
+                  <Link to="/protection" className="block hover:text-white">Protection des lanceurs d'alerte</Link>
+                  <Link to="/confidentialite" className="block hover:text-white">Politique de confidentialité</Link>
+                  <Link to="/conditions" className="block hover:text-white">Conditions d'utilisation</Link>
+                </div>
               </div>
             </div>
             <div className="border-t border-white/20 pt-4 text-center text-xs text-white/50">

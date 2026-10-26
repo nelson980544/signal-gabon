@@ -4,11 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Preuve;
 use App\Models\Signalement;
-use App\Services\ImageSanitizer;
+use App\Services\MetadataSanitizer;
 use Illuminate\Http\Request;
 
 class SignalementPublicController extends Controller
 {
+    /**
+     * Libellé neutre donné à une preuve.
+     *
+     * Le nom choisi par le citoyen peut le désigner aussi sûrement qu'une
+     * signature (« rapport_de_jean.pdf ») : il ne doit atteindre ni la base,
+     * ni l'écran de l'agent.
+     */
+    private function libellePreuve(int $rang, $file): string
+    {
+        $extension = strtolower($file->guessExtension() ?: $file->getClientOriginalExtension());
+
+        return 'Preuve ' . $rang . ($extension !== '' ? '.' . $extension : '');
+    }
+
     /**
      * Génère un code de suivi unique en utilisant random_int() (CSPRNG).
      * Évite str_shuffle() qui n'est pas cryptographiquement sûr.
@@ -37,7 +51,9 @@ class SignalementPublicController extends Controller
         $validated = $request->validate([
             'categorie'     => 'required|in:Administration publique,Police et gendarmerie,Santé et hôpitaux,Éducation et universités,Douanes et frontières,Justice et tribunaux,Marchés publics,Autre',
             'description'   => 'required|string|min:50',
-            'date_faits'    => 'required|date',
+            // « tomorrow » et non « today » : le serveur est en UTC, et un
+            // citoyen de Libreville (UTC+1) a déjà changé de jour à minuit.
+            'date_faits'    => 'required|date|before_or_equal:tomorrow',
             'province'      => 'required|in:Estuaire,Haut-Ogooué,Moyen-Ogooué,Ngounié,Nyanga,Ogooué-Ivindo,Ogooué-Lolo,Ogooué-Maritime,Woleu-Ntem',
             'ville'         => 'required|string|max:100',
             'email_contact' => 'sometimes|nullable|email|max:255',
@@ -54,13 +70,13 @@ class SignalementPublicController extends Controller
 
         $s = Signalement::create($signalementData);
 
-        // Supprimer les EXIF et stocker via le disk configuré (local ou S3/R2)
-        foreach ($fileData as $file) {
-            ImageSanitizer::strip($file->getRealPath());
+        // Supprimer les métadonnées et stocker via le disk configuré
+        foreach (array_values($fileData) as $rang => $file) {
+            MetadataSanitizer::strip($file->getRealPath());
             $path = $file->store("preuves/{$s->code}");
             Preuve::create([
                 'signalement_id' => $s->id,
-                'nom_fichier'    => $file->getClientOriginalName(),
+                'nom_fichier'    => $this->libellePreuve($rang + 1, $file),
                 'chemin'         => $path,
                 'type_fichier'   => $file->getMimeType(),
                 'taille'         => $file->getSize(),
@@ -105,12 +121,13 @@ class SignalementPublicController extends Controller
         }
 
         $preuves = [];
-        foreach ($request->file('fichiers') as $file) {
-            ImageSanitizer::strip($file->getRealPath());
+        foreach (array_values($request->file('fichiers')) as $rang => $file) {
+            MetadataSanitizer::strip($file->getRealPath());
             $path      = $file->store("preuves/{$code}");
             $preuves[] = Preuve::create([
                 'signalement_id' => $s->id,
-                'nom_fichier'    => $file->getClientOriginalName(),
+                // La numérotation continue celle des preuves déjà déposées.
+                'nom_fichier'    => $this->libellePreuve($existantes + $rang + 1, $file),
                 'chemin'         => $path,
                 'type_fichier'   => $file->getMimeType(),
                 'taille'         => $file->getSize(),

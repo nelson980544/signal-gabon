@@ -1,0 +1,74 @@
+# Pile de production SignalGabon, pensée pour une seule machine
+# administrée par une seule personne.
+#
+#   docker compose --env-file ../backend/.env up -d
+#
+# Les données vivent dans deux volumes nommés : `mariadb` et `preuves`.
+# Ce sont eux que sauvegarde deploy/sauvegarde.sh.
+
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mariadb:/var/lib/mysql
+    # La base n'est jamais exposée hors de la machine : pas de section `ports`.
+    networks: [interne]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: ../backend/.env
+    volumes:
+      # Les preuves survivent aux reconstructions de l'image.
+      - preuves:/var/www/html/storage/app/private/preuves
+    networks: [interne]
+
+  web:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/default.conf.template:ro
+      - certbot-conf:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot
+    environment:
+      NOM_DE_DOMAINE: ${NOM_DE_DOMAINE}
+    networks: [interne]
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot-conf:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    # Renouvellement toutes les 12 h ; certbot ne fait rien tant que le
+    # certificat n'approche pas de son échéance.
+    entrypoint: sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done'
+    networks: [interne]
+
+volumes:
+  mariadb:
+  preuves:
+  certbot-conf:
+  certbot-www:
+
+networks:
+  interne:

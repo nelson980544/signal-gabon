@@ -134,6 +134,74 @@ npm run dev                   # http://localhost:5174
 
 ---
 
+## Hébergement au Gabon
+
+Les données de signalement ne doivent pas quitter le territoire : voir
+[`docs/hebergement-cahier-des-charges.md`](docs/hebergement-cahier-des-charges.md)
+(document à remettre à l'hébergeur) et
+[`docs/exploitation.md`](docs/exploitation.md) (installation et administration
+pas à pas).
+
+Le nécessaire de déploiement est dans [`deploy/`](deploy/) : pile Docker
+(nginx + php-fpm + MariaDB + certbot), sauvegarde chiffrée et restauration.
+Dans cette configuration, l'API, la base et les preuves sont sur le serveur
+gabonais ; seules les pages React restent sur Vercel.
+
+> **Comptes de démonstration et production.** Les comptes listés plus haut sont
+> créés par `php artisan db:seed`, réservé au développement. Sur un serveur de
+> production, le premier compte se crée avec
+> `php artisan cnlcei:creer-superviseur`, qui demande un mot de passe fort.
+
+---
+
+## Déploiement (Vercel)
+
+Le dépôt se déploie en **un seul projet Vercel** pointant sur la racine. Le build
+(`npm run build` → `scripts/build-site.mjs`) assemble un site unifié :
+
+| URL | Contenu |
+|-----|---------|
+| `/` | Page d'accueil : choix entre l'espace citoyen et l'espace agent |
+| `/citoyen/` | Application citoyenne (`citizen-app`) |
+| `/admin/` | Interface agents CNLCEI (`admin-app`) |
+
+Réglages du projet Vercel :
+
+- **Root Directory** : la racine du dépôt (laisser vide)
+- **Framework Preset** : `Other` — tout est déjà décrit dans `vercel.json`
+- **Variables d'environnement** : `VITE_API_URL=https://<api>/api`
+  (sans elle, les deux apps appellent `http://localhost:8000/api`)
+
+Le backend Laravel se déploie séparément (voir `backend/render.yaml`,
+`backend/railway.json` ou `backend/vercel.json`).
+
+### Comment ça marche
+
+Chaque app est construite avec la variable `APP_BASE` (`/citoyen/`, `/admin/`),
+reprise par Vite (`base`) et par React Router (`basename={import.meta.env.BASE_URL}`).
+Les réécritures SPA de `vercel.json` renvoient toute URL d'un sous-chemin vers
+l'`index.html` de l'app correspondante — sans elles, un rechargement sur
+`/citoyen/suivi` renverrait un 404.
+
+Chaque app garde son propre `vercel.json` : elle peut toujours être déployée
+seule (Root Directory = `citizen-app` ou `admin-app`), et elle est alors servie
+à la racine de son domaine.
+
+### Build en local
+
+```bash
+npm run build      # depuis la racine
+npx serve dist     # ou tout serveur statique
+```
+
+### Points de contrôle en cas de 404
+
+1. Le *Root Directory* du projet Vercel est bien la racine du dépôt.
+2. Le dernier déploiement est marqué *Ready* (et non *Error*) et promu en production.
+3. `VITE_API_URL` est défini sur le projet.
+
+---
+
 ## Licence
 
 MIT — République Gabonaise / CNLCEI — 2024

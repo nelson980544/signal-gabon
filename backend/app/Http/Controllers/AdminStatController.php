@@ -35,7 +35,7 @@ class AdminStatController extends Controller
         $db = config('database.default');
         if ($db === 'pgsql') {
             $rawAvg = 'AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 86400)';
-        } elseif ($db === 'mysql') {
+        } elseif ($db === 'mysql' || $db === 'mariadb') {
             $rawAvg = 'AVG(TIMESTAMPDIFF(SECOND, created_at, updated_at) / 86400)';
         } else {
             $rawAvg = 'AVG(JULIANDAY(updated_at) - JULIANDAY(created_at))';
@@ -58,14 +58,15 @@ class AdminStatController extends Controller
     {
         $stats = $this->publiques()->getData(true);
 
-        $nonAttribues = Signalement::whereNull('agent_id')->count();
-        $parAgent = User::where('role', 'agent')
-            ->withCount('signalements')
-            ->get()
-            ->map(fn($u) => ['agent' => $u->name, 'total' => $u->signalements_count]);
+        $stats['non_attribues'] = Signalement::whereNull('agent_id')->count();
 
-        $stats['non_attribues'] = $nonAttribues;
-        $stats['par_agent']     = $parAgent;
+        // La charge nominative des agents est réservée au superviseur.
+        if ($request->user()->role === 'superviseur') {
+            $stats['par_agent'] = User::where('role', 'agent')
+                ->withCount('signalements')
+                ->get()
+                ->map(fn($u) => ['agent' => $u->name, 'total' => $u->signalements_count]);
+        }
 
         return response()->json($stats);
     }
